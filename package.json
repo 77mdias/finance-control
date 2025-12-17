@@ -46,7 +46,10 @@
     "tailwindcss": "^4.0.6",
     "tw-animate-css": "^1.3.6",
     "vite-tsconfig-paths": "^5.1.4",
-    "zod": "4.1.11"
+    "zod": "4.1.11",
+    "better-auth": "^1.0.0",
+    "better-auth/react": "^1.0.0",
+    "better-auth/adapters/prisma": "^1.0.0"
   },
   "devDependencies": {
     "@tanstack/devtools-vite": "^0.3.11",

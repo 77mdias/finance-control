@@ -39,6 +39,12 @@
     - [ ] **BKD-001.f** - CSRF protection para write endpoints (token generation/validation) — 1h
     - [ ] **BKD-001.g** - Testes unitários e integração para auth (register/login/logout + falhas) — 3h
     - [ ] **BKD-001.h** - Documentar contrato de API e exemplos (docs/dev + BKD-006 link) — 1h
+    - [ ] **BKD-001.i** - Integrar Better Auth (adapter Prisma) — 4h
+      - [ ] Adicionar dependências `better-auth`, `better-auth/react` e adapter Prisma
+      - [ ] Criar `src/lib/auth.ts` e `src/lib/auth-client.ts` e handler `/api/auth/*`
+      - [ ] Atualizar `prisma/schema.prisma` com modelos de auth e rodar migrations
+      - [ ] Atualizar `prisma/seed.ts` com seeds mínimos para testes de auth
+      - [ ] Testes: register/login/logout e proteção de rotas (unit + integração)
   - **Prioridade:** 🔴 Crítica
   - **Estimativa (total):** 11.5h
   - **Dependências:** nenhum
