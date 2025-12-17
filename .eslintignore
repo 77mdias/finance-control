@@ -5,8 +5,7 @@ build
 .tanstack
 coverage
 prisma/client
-public/manifest.json
-public/robots.txt
+public
 **/*.min.js
 .env
 .env.*

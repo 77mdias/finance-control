@@ -13,7 +13,7 @@ const todos = fs.existsSync(todosPath)
     ]
 
 // Subscription callbacks per userID
-let subscribers: ((todos: Todo[]) => void)[] = []
+let subscribers: Array<(todos: Array<Todo>) => void> = []
 
 export type Todo = {
   id: number
@@ -21,7 +21,7 @@ export type Todo = {
 }
 
 // Get the todos for a user
-export function getTodos(): Todo[] {
+export function getTodos(): Array<Todo> {
   return todos
 }
 
@@ -33,7 +33,7 @@ export function addTodo(title: string) {
 }
 
 // Subscribe to cart changes for a user
-export function subscribeToTodos(callback: (todos: Todo[]) => void) {
+export function subscribeToTodos(callback: (todos: Array<Todo>) => void) {
   subscribers.push(callback)
   callback(todos)
   return () => {

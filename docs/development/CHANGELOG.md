@@ -2,7 +2,7 @@
 
 Este changelog registra mudanças em **processos, templates e documentação de development** (não é o changelog de releases do produto).
 
-O formato é inspirado em *Keep a Changelog*.
+O formato é inspirado em _Keep a Changelog_.
 
 ## [Unreleased]
 
@@ -26,4 +26,3 @@ O formato é inspirado em *Keep a Changelog*.
 ### Scripts
 
 - 2025-12-17: `scripts/archive-subtask.js` adicionado para automatizar arquivamento de subtasks; `docs/development/TASKS/ARCHIVED/` criado.
-

@@ -13,17 +13,25 @@ if (!argv[0]) usage()
 const subtaskPath = path.resolve(argv[0])
 let phaseFile
 for (let i = 1; i < argv.length; i++) {
-  if (argv[i] === '--phase' && argv[i + 1]) { phaseFile = path.resolve(argv[i + 1]); i++ }
+  if (argv[i] === '--phase' && argv[i + 1]) {
+    phaseFile = path.resolve(argv[i + 1])
+    i++
+  }
 }
 
 async function ensureDir(dir) {
-  try { await fs.mkdir(dir, { recursive: true }) } catch (e) { }
+  try {
+    await fs.mkdir(dir, { recursive: true })
+  } catch (e) {}
 }
 
 async function main() {
   try {
     const exists = await fs.stat(subtaskPath).catch(() => null)
-    if (!exists) { console.error('Subtask file not found:', subtaskPath); process.exit(2) }
+    if (!exists) {
+      console.error('Subtask file not found:', subtaskPath)
+      process.exit(2)
+    }
 
     const tasksDir = path.resolve('docs/development/TASKS')
     const archiveDir = path.join(tasksDir, 'ARCHIVED')
@@ -62,7 +70,6 @@ async function main() {
         console.log('Phase file updated: no matching unchecked entry found for', id)
       }
     }
-
   } catch (err) {
     console.error('Error archiving subtask:', err)
     process.exit(3)

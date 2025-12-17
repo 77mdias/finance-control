@@ -56,8 +56,7 @@ function App() {
     <div
       className="flex items-center justify-center min-h-screen bg-gradient-to-br from-purple-100 to-blue-100 p-4 text-white"
       style={{
-        backgroundImage:
-          'radial-gradient(circle at 5% 40%, #63F655 0%, #00E0D9 40%, #1a0f0a 100%)',
+        backgroundImage: 'radial-gradient(circle at 5% 40%, #63F655 0%, #00E0D9 40%, #1a0f0a 100%)',
       }}
     >
       <div className="w-full max-w-2xl p-8 rounded-xl backdrop-blur-md bg-black/50 shadow-xl border-8 border-black/10">
@@ -143,9 +142,8 @@ function DBConnectionError() {
               1
             </span>
             <div>
-              Use the{' '}
-              <code className="bg-black/30 px-2 py-1 rounded">db/init.sql</code>{' '}
-              file to create the database
+              Use the <code className="bg-black/30 px-2 py-1 rounded">db/init.sql</code> file to
+              create the database
             </div>
           </li>
           <li className="flex items-start">
@@ -153,12 +151,8 @@ function DBConnectionError() {
               2
             </span>
             <div>
-              Set the{' '}
-              <code className="bg-black/30 px-2 py-1 rounded">
-                DATABASE_URL
-              </code>{' '}
-              environment variable to the connection string of your Neon
-              database
+              Set the <code className="bg-black/30 px-2 py-1 rounded">DATABASE_URL</code>{' '}
+              environment variable to the connection string of your Neon database
             </div>
           </li>
         </ul>

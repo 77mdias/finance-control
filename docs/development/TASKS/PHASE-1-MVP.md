@@ -10,13 +10,13 @@
 
 ## 📊 Resumo de Progresso
 
-| Categoria | Total | Concluído | Parcial | Pendente | Bloqueado |
-|----------|------:|----------:|--------:|---------:|----------:|
-| Backend  |   6   |     0     |   0     |    6     |    0      |
-| Frontend |   6   |     0     |   0     |    6     |    0      |
-| DevOps   |   3   |     0     |   0     |    3     |    0      |
-| Testes   |   4   |     0     |   0     |    4     |    0      |
-| **TOTAL**| **19**|   **0**   | **0**   | **19**   | **0**     |
+| Categoria |  Total | Concluído | Parcial | Pendente | Bloqueado |
+| --------- | -----: | --------: | ------: | -------: | --------: |
+| Backend   |      6 |         0 |       0 |        6 |         0 |
+| Frontend  |      6 |         0 |       0 |        6 |         0 |
+| DevOps    |      3 |         0 |       0 |        3 |         0 |
+| Testes    |      4 |         0 |       0 |        4 |         0 |
+| **TOTAL** | **19** |     **0** |   **0** |   **19** |     **0** |
 
 ### 🎯 Principais objetivos
 

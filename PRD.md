@@ -1,9 +1,7 @@
 ---
-
 # 📄 PRODUCT REQUIREMENTS DOCUMENT (PRD)
 
 ## Simple Finance Control App (MVP)
-
 ---
 
 ## 1. Visão Geral do Produto
@@ -22,15 +20,15 @@ O produto é inicialmente de **uso pessoal**, mas com arquitetura preparada para
 
 ## 2. Objetivo do MVP
 
-* Centralizar o controle financeiro pessoal
-* Eliminar dependência de planilhas e apps externos
-* Oferecer visão clara de:
+- Centralizar o controle financeiro pessoal
+- Eliminar dependência de planilhas e apps externos
+- Oferecer visão clara de:
+  - Saldo mensal
+  - Ganhos vs gastos
+  - Assinaturas ativas
+  - Faturas por cartão
 
-  * Saldo mensal
-  * Ganhos vs gastos
-  * Assinaturas ativas
-  * Faturas por cartão
-* Garantir **segurança e privacidade** dos dados
+- Garantir **segurança e privacidade** dos dados
 
 ---
 
@@ -38,12 +36,12 @@ O produto é inicialmente de **uso pessoal**, mas com arquitetura preparada para
 
 ### Usuário Primário
 
-* Desenvolvedor solo (criador do app)
+- Desenvolvedor solo (criador do app)
 
 ### Usuários Secundários (futuro)
 
-* Usuários convidados
-* Pessoas que querem controle financeiro simples e offline-first
+- Usuários convidados
+- Pessoas que querem controle financeiro simples e offline-first
 
 ---
 
@@ -51,15 +49,15 @@ O produto é inicialmente de **uso pessoal**, mas com arquitetura preparada para
 
 Ferramentas financeiras existentes:
 
-* São excessivamente complexas
-* Coletam dados sensíveis
-* Forçam integrações bancárias
+- São excessivamente complexas
+- Coletam dados sensíveis
+- Forçam integrações bancárias
 
 **O app resolve:**
 
-* Controle manual, porém organizado
-* Dados sob total controle do usuário
-* Interface simples e objetiva
+- Controle manual, porém organizado
+- Dados sob total controle do usuário
+- Interface simples e objetiva
 
 ---
 
@@ -67,24 +65,24 @@ Ferramentas financeiras existentes:
 
 ### Incluído
 
-* Autenticação local
-* Registro de ganhos e gastos
-* Controle de saldo
-* Cartões personalizados
-* Assinaturas recorrentes
-* Faturas mensais
-* Persistência em banco PostgreSQL
-* Criptografia de dados sensíveis
-* UI animada simples
+- Autenticação local
+- Registro de ganhos e gastos
+- Controle de saldo
+- Cartões personalizados
+- Assinaturas recorrentes
+- Faturas mensais
+- Persistência em banco PostgreSQL
+- Criptografia de dados sensíveis
+- UI animada simples
 
 ### Fora do Escopo (não-MVP)
 
-* Integração bancária
-* Pagamentos
-* IA / previsões
-* Notificações push
-* App mobile nativo
-* Monetização
+- Integração bancária
+- Pagamentos
+- IA / previsões
+- Notificações push
+- App mobile nativo
+- Monetização
 
 ---
 
@@ -99,10 +97,10 @@ Sistema de autenticação simples, local.
 
 **Requisitos**
 
-* Login com senha
-* Senha armazenada com hash (bcrypt)
-* Sessão via cookie httpOnly
-* Apenas um usuário no MVP (arquitetura preparada para multi-user)
+- Login com senha
+- Senha armazenada com hash (bcrypt)
+- Sessão via cookie httpOnly
+- Apenas um usuário no MVP (arquitetura preparada para multi-user)
 
 ---
 
@@ -110,16 +108,16 @@ Sistema de autenticação simples, local.
 
 **Funcionalidades**
 
-* Saldo atual
-* Total de ganhos do mês
-* Total de gastos do mês
-* Resultado líquido (positivo/negativo)
-* Lista resumida de assinaturas
+- Saldo atual
+- Total de ganhos do mês
+- Total de gastos do mês
+- Resultado líquido (positivo/negativo)
+- Lista resumida de assinaturas
 
 **Critérios**
 
-* Dados filtrados por mês
-* Atualização em tempo real após operações
+- Dados filtrados por mês
+- Atualização em tempo real após operações
 
 ---
 
@@ -127,17 +125,17 @@ Sistema de autenticação simples, local.
 
 **Campos**
 
-* Valor
-* Descrição
-* Categoria
-* Data
-* Recorrente (sim/não)
+- Valor
+- Descrição
+- Categoria
+- Data
+- Recorrente (sim/não)
 
 **Regras**
 
-* Atualiza saldo automaticamente
-* Editável e removível
-* Histórico mensal acessível
+- Atualiza saldo automaticamente
+- Editável e removível
+- Histórico mensal acessível
 
 ---
 
@@ -145,18 +143,18 @@ Sistema de autenticação simples, local.
 
 **Campos**
 
-* Valor
-* Descrição
-* Categoria
-* Data
-* Cartão associado (opcional)
-* Assinatura associada (opcional)
+- Valor
+- Descrição
+- Categoria
+- Data
+- Cartão associado (opcional)
+- Assinatura associada (opcional)
 
 **Regras**
 
-* Atualiza saldo automaticamente
-* Pode compor faturas
-* Pode ser gerado automaticamente por assinatura
+- Atualiza saldo automaticamente
+- Pode compor faturas
+- Pode ser gerado automaticamente por assinatura
 
 ---
 
@@ -167,18 +165,18 @@ Cartões são **entidades lógicas**, não cartões bancários reais.
 
 **Campos**
 
-* Nome personalizado (ex: “Spotify Assinatura”)
-* Tipo (Crédito / Assinatura)
-* Número do cartão (criptografado)
-* Últimos 4 dígitos
-* Cor ou gradiente
-* Ícone
+- Nome personalizado (ex: “Spotify Assinatura”)
+- Tipo (Crédito / Assinatura)
+- Número do cartão (criptografado)
+- Últimos 4 dígitos
+- Cor ou gradiente
+- Ícone
 
 **Regras**
 
-* Número completo nunca é exibido
-* Dados sensíveis criptografados antes de salvar
-* Cards exibidos com animação
+- Número completo nunca é exibido
+- Dados sensíveis criptografados antes de salvar
+- Cards exibidos com animação
 
 ---
 
@@ -186,17 +184,17 @@ Cartões são **entidades lógicas**, não cartões bancários reais.
 
 **Campos**
 
-* Nome
-* Valor
-* Cartão associado
-* Dia de cobrança
-* Ativa/Inativa
+- Nome
+- Valor
+- Cartão associado
+- Dia de cobrança
+- Ativa/Inativa
 
 **Regras**
 
-* Gera automaticamente um gasto mensal
-* Pode ser pausada
-* Aparece em faturas e dashboard
+- Gera automaticamente um gasto mensal
+- Pode ser pausada
+- Aparece em faturas e dashboard
 
 ---
 
@@ -204,10 +202,10 @@ Cartões são **entidades lógicas**, não cartões bancários reais.
 
 **Funcionalidades**
 
-* Visualização por mês/ano
-* Lista de gastos associados
-* Total da fatura
-* Status (Aberta / Fechada)
+- Visualização por mês/ano
+- Lista de gastos associados
+- Total da fatura
+- Status (Aberta / Fechada)
 
 ---
 
@@ -215,21 +213,21 @@ Cartões são **entidades lógicas**, não cartões bancários reais.
 
 ### Segurança
 
-* Criptografia AES para números de cartão
-* Hash de senha com bcrypt
-* Nenhum dado sensível em LocalStorage
+- Criptografia AES para números de cartão
+- Hash de senha com bcrypt
+- Nenhum dado sensível em LocalStorage
 
 ### Performance
 
-* Resposta rápida (<200ms em operações comuns)
-* Queries otimizadas com índices
+- Resposta rápida (<200ms em operações comuns)
+- Queries otimizadas com índices
 
 ### UX/UI
 
-* Mobile-first
-* Dark mode
-* Interface limpa
-* Animações leves (não intrusivas)
+- Mobile-first
+- Dark mode
+- Interface limpa
+- Animações leves (não intrusivas)
 
 ---
 
@@ -241,21 +239,21 @@ Cartões são **entidades lógicas**, não cartões bancários reais.
 
 **Frontend**
 
-* TanStack Start
-* React
-* TypeScript
-* TailwindCSS
-* Framer Motion
+- TanStack Start
+- React
+- TypeScript
+- TailwindCSS
+- Framer Motion
 
 **Backend**
 
-* TanStack Start (Server Functions)
-* Node.js
+- TanStack Start (Server Functions)
+- Node.js
 
 **Banco de Dados**
 
-* PostgreSQL
-* Prisma ORM
+- PostgreSQL
+- Prisma ORM
 
 ---
 
@@ -263,13 +261,13 @@ Cartões são **entidades lógicas**, não cartões bancários reais.
 
 **Desenvolvimento**
 
-* Postgres local ou Neon
-* Prisma Migrate
+- Postgres local ou Neon
+- Prisma Migrate
 
 **Produção**
 
-* Neon / Supabase / Railway
-* Vercel ou Fly.io
+- Neon / Supabase / Railway
+- Vercel ou Fly.io
 
 ---
 
@@ -277,52 +275,52 @@ Cartões são **entidades lógicas**, não cartões bancários reais.
 
 ### User
 
-* id (UUID)
-* passwordHash
-* createdAt
+- id (UUID)
+- passwordHash
+- createdAt
 
 ### Card
 
-* id
-* userId
-* name
-* encryptedNumber
-* lastDigits
-* color
-* type
-* createdAt
+- id
+- userId
+- name
+- encryptedNumber
+- lastDigits
+- color
+- type
+- createdAt
 
 ### Transaction
 
-* id
-* userId
-* type (CREDIT/DEBIT)
-* value
-* description
-* category
-* date
-* cardId (opcional)
-* createdAt
+- id
+- userId
+- type (CREDIT/DEBIT)
+- value
+- description
+- category
+- date
+- cardId (opcional)
+- createdAt
 
 ### Subscription
 
-* id
-* userId
-* name
-* value
-* cardId
-* billingDay
-* active
-* createdAt
+- id
+- userId
+- name
+- value
+- cardId
+- billingDay
+- active
+- createdAt
 
 ### Invoice (opcional no MVP)
 
-* id
-* userId
-* month
-* year
-* total
-* status
+- id
+- userId
+- month
+- year
+- total
+- status
 
 ---
 
@@ -330,36 +328,36 @@ Cartões são **entidades lógicas**, não cartões bancários reais.
 
 ### Fase 1 – Foundation
 
-* Setup TanStack Start
-* Configuração Postgres + Prisma
-* Auth simples
+- Setup TanStack Start
+- Configuração Postgres + Prisma
+- Auth simples
 
 ### Fase 2 – Core Financeiro
 
-* Ganhos e gastos
-* Dashboard
-* Saldo
+- Ganhos e gastos
+- Dashboard
+- Saldo
 
 ### Fase 3 – Cartões e Assinaturas
 
-* CRUD de cartões
-* Assinaturas recorrentes
-* Faturas
+- CRUD de cartões
+- Assinaturas recorrentes
+- Faturas
 
 ### Fase 4 – Hardening
 
-* Criptografia
-* UX refinado
-* Preparação para deploy
+- Criptografia
+- UX refinado
+- Preparação para deploy
 
 ---
 
 ## 11. Critérios de Sucesso
 
-* Controle financeiro mensal funcional
-* Nenhum dado sensível exposto
-* UX rápida e clara
-* Código limpo e extensível
+- Controle financeiro mensal funcional
+- Nenhum dado sensível exposto
+- UX rápida e clara
+- Código limpo e extensível
 
 ---
 

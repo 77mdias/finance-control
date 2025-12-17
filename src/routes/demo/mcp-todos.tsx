@@ -1,4 +1,4 @@
-import { useCallback, useState, useEffect } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
 
 type Todo = {
@@ -11,7 +11,7 @@ export const Route = createFileRoute('/demo/mcp-todos')({
 })
 
 function ORPCTodos() {
-  const [todos, setTodos] = useState<Todo[]>([])
+  const [todos, setTodos] = useState<Array<Todo>>([])
 
   useEffect(() => {
     const eventSource = new EventSource('/demo/api/mcp-todos')
@@ -42,7 +42,7 @@ function ORPCTodos() {
       <div className="w-full max-w-2xl p-8 rounded-xl backdrop-blur-md bg-black/50 shadow-xl border-8 border-black/10">
         <h1 className="text-2xl mb-4">MCP Todos list</h1>
         <ul className="mb-4 space-y-2">
-          {todos?.map((t) => (
+          {todos.map((t) => (
             <li
               key={t.id}
               className="bg-white/10 border border-white/20 rounded-lg p-3 backdrop-blur-sm shadow-md"
