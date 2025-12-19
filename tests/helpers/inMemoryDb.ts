@@ -26,10 +26,22 @@ type StoredCard = {
 type StoredSubscription = {
   id: string
   userId: string
+  cardId: string | null
+  name: string
+  value: number
+  billingDay: number
+  active: boolean
+  createdAt: Date
+  updatedAt: Date
 }
 
-function createId() {
-  return `tx_${Math.random().toString(36).slice(2, 10)}`
+type StoredUser = {
+  id: string
+  timezone?: string
+}
+
+function createId(prefix = 'id_') {
+  return `${prefix}${Math.random().toString(36).slice(2, 10)}`
 }
 
 function matchesWhere(transaction: StoredTransaction, where?: Prisma.TransactionWhereInput) {
@@ -68,16 +80,19 @@ export class InMemoryDb {
   transactions: StoredTransaction[]
   cards: StoredCard[]
   subscriptions: StoredSubscription[]
+  users: StoredUser[]
   lastFindManyArgs?: Prisma.TransactionFindManyArgs
 
   constructor(options?: {
     transactions?: StoredTransaction[]
     cards?: StoredCard[]
     subscriptions?: StoredSubscription[]
+    users?: StoredUser[]
   }) {
     this.transactions = options?.transactions ?? []
     this.cards = options?.cards ?? []
     this.subscriptions = options?.subscriptions ?? []
+    this.users = options?.users ?? []
   }
 
   transaction = {
@@ -89,6 +104,11 @@ export class InMemoryDb {
       const end = args.take ? start + args.take : undefined
       return sorted.slice(start, end)
     },
+    findFirst: async (args: Prisma.TransactionFindFirstArgs) => {
+      const filtered = this.transactions.filter((item) => matchesWhere(item, args.where))
+      const sorted = sortTransactions(filtered)
+      return sorted[0] ?? null
+    },
     count: async (args: Prisma.TransactionCountArgs) => {
       return this.transactions.filter((item) => matchesWhere(item, args.where)).length
     },
@@ -98,7 +118,7 @@ export class InMemoryDb {
     create: async (args: Prisma.TransactionCreateArgs) => {
       const now = new Date()
       const next: StoredTransaction = {
-        id: createId(),
+        id: createId('tx_'),
         userId: args.data.userId as string,
         type: args.data.type as StoredTransaction['type'],
         value: Number(args.data.value),
@@ -207,7 +227,92 @@ export class InMemoryDb {
 
   subscription = {
     findUnique: async (args: Prisma.SubscriptionFindUniqueArgs) => {
-      return this.subscriptions.find((subscription) => subscription.id === args.where.id) ?? null
+      const item = this.subscriptions.find((subscription) => subscription.id === args.where.id)
+      if (!item) return null
+
+      if (args.include?.user) {
+        const user = this.users.find((current) => current.id === item.userId) ?? {
+          id: item.userId,
+          timezone: 'UTC',
+        }
+
+        return { ...item, user }
+      }
+
+      return item
+    },
+    findMany: async (args: Prisma.SubscriptionFindManyArgs = {}) => {
+      const where = args.where ?? {}
+
+      const items = this.subscriptions.filter((subscription) => {
+        if (where.userId && subscription.userId !== where.userId) return false
+        if (where.active !== undefined && subscription.active !== where.active) return false
+        return true
+      })
+
+      const ordered =
+        args.orderBy && 'createdAt' in args.orderBy && args.orderBy.createdAt === 'desc'
+          ? [...items].sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
+          : items
+
+      return ordered.map((subscription) => {
+        if (args.include?.user) {
+          const user = this.users.find((current) => current.id === subscription.userId) ?? {
+            id: subscription.userId,
+            timezone: 'UTC',
+          }
+          return { ...subscription, user }
+        }
+        return subscription
+      })
+    },
+    create: async (args: Prisma.SubscriptionCreateArgs) => {
+      const now = new Date()
+      const next: StoredSubscription = {
+        id: (args.data.id as string | undefined) ?? createId('sub_'),
+        userId: args.data.userId as string,
+        cardId: (args.data.cardId as string | null | undefined) ?? null,
+        name: args.data.name as string,
+        value: Number(args.data.value),
+        billingDay: args.data.billingDay as number,
+        active: (args.data.active as boolean | undefined) ?? true,
+        createdAt: now,
+        updatedAt: now,
+      }
+
+      this.subscriptions.push(next)
+      return next
+    },
+    update: async (args: Prisma.SubscriptionUpdateArgs) => {
+      const index = this.subscriptions.findIndex(
+        (subscription) => subscription.id === args.where.id,
+      )
+      if (index === -1) {
+        throw new Error('Not found')
+      }
+
+      const existing = this.subscriptions[index]
+      const data = args.data
+
+      const next: StoredSubscription = {
+        ...existing,
+        name: (data.name as string | undefined) ?? existing.name,
+        value: data.value !== undefined ? Number(data.value) : existing.value,
+        billingDay: (data.billingDay as number | undefined) ?? existing.billingDay,
+        cardId:
+          data.cardId !== undefined ? ((data.cardId as string | null) ?? null) : existing.cardId,
+        active: (data.active as boolean | undefined) ?? existing.active,
+        updatedAt: new Date(),
+      }
+
+      this.subscriptions[index] = next
+      return next
+    },
+  }
+
+  user = {
+    findUnique: async (args: Prisma.UserFindUniqueArgs) => {
+      return this.users.find((user) => user.id === args.where.id) ?? null
     },
   }
 }

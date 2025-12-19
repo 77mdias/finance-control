@@ -10,6 +10,8 @@ O formato é inspirado em _Keep a Changelog_.
 
 ### Added
 
+- Assinaturas backend: Server Functions (`src/routes/subscriptions.server.ts`), job mensal idempotente (`src/jobs/subscriptions.ts`) e testes (`tests/unit/subscriptions.server.test.ts`) cobrindo geração automática de transações.
+- Agendamento para Vercel (`vercel.json`) chamando `/api/subscriptions/cron` diariamente às 06:00 UTC (header `x-vercel-cron`).
 - Criptografia AES-256-GCM para cartões lógicos (`src/lib/crypto.ts`) com chave `CARD_ENCRYPTION_KEY` (plain/hex/base64).
 - Server Functions de cartões (`src/routes/cards.server.ts`) com criação/listagem/atualização expondo apenas `lastDigits`.
 - Testes unitários para cartões (`tests/unit/cards.server.test.ts`) cobrindo criptografia, ownership e ordenação.
@@ -17,7 +19,7 @@ O formato é inspirado em _Keep a Changelog_.
 ### Changed
 
 - `.env.example` documenta `CARD_ENCRYPTION_KEY` e exemplo base64.
-- `docs/development/TASKS/PHASE-1-MVP.md` marca BKD-004 como concluída e ajusta progresso.
+- `docs/development/TASKS/PHASE-1-MVP.md` marca BKD-004/BKD-005 como concluídas e ajusta progresso.
 
 ## [2025-12-19]
 

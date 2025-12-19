@@ -12,11 +12,11 @@
 
 | Categoria |  Total | Concluído | Parcial | Pendente | Bloqueado |
 | --------- | -----: | --------: | ------: | -------: | --------: |
-| Backend   |      6 |         4 |       0 |        2 |         0 |
+| Backend   |      6 |         5 |       0 |        1 |         0 |
 | Frontend  |      6 |         0 |       0 |        6 |         0 |
 | DevOps    |      3 |         1 |       0 |        2 |         0 |
 | Testes    |      4 |         0 |       0 |        4 |         0 |
-| **TOTAL** | **19** |     **5** |   **0** |   **14** |     **0** |
+| **TOTAL** | **19** |     **6** |   **0** |   **13** |     **0** |
 
 ### 🎯 Principais objetivos
 
@@ -84,12 +84,15 @@
   - **Arquivos:** `src/lib/crypto.ts`, `src/routes/cards.server.ts`, `tests/unit/cards.server.test.ts`
   - **Notas:** AES-256-GCM com IV aleatório; chave via `CARD_ENCRYPTION_KEY` suportando plain/hex/base64. Apenas `lastDigits` expostos, número completo nunca sai do backend.
 
-- [ ] **BKD-005** - Assinaturas (geração de transações recorrentes)
-  - [ ] Model + job simples que gera transações por assinatura (cron diário mínimo) — job pode rodar em server-side cron ou em worker separado
+- [x] **BKD-005** - Assinaturas (geração de transações recorrentes)
+  - [x] Job idempotente por mês que gera débitos de assinaturas ativas (usa timezone do usuário e evita duplicar se já existir cobrança no mês)
+  - [x] Server Functions para criar/listar/atualizar assinaturas com validação de cartão do usuário
+  - [x] Testes unitários cobrindo job e contratos (`tests/unit/subscriptions.server.test.ts`)
+  - [x] Agendamento Vercel via `vercel.json` (`0 6 * * *` chamando `/api/subscriptions/cron`, protegido por header `x-vercel-cron`)
   - **Prioridade:** 🟡 Alta
   - **Estimativa:** 4h
   - **Dependências:** BKD-002, BKD-003
-  - **Arquivos:** `src/jobs/subscriptions.*`, `src/routes/subscriptions.server.ts`
+  - **Arquivos:** `src/jobs/subscriptions.ts`, `src/routes/subscriptions.server.ts`, `tests/unit/subscriptions.server.test.ts`
 
 - [ ] **BKD-006** - OpenAPI / Docs (dev)
   - [ ] Publicar `GET /docs/openapi.json` e UI dev (auth opt-in). Observação: Server Functions podem não gerar spec automaticamente — documentar contratos ou gerar spec manualmente (Swagger/OpenAPI) para endpoints principais.
