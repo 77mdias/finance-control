@@ -7,6 +7,7 @@ on:
 
 jobs:
   migrate-prod:
+    if: github.repository == '77mdias/finance-control' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     env:
       VITE_DATABASE_URL: ${{ secrets.VITE_DATABASE_URL_PROD }}
