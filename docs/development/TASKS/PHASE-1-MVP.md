@@ -3,7 +3,7 @@
 **Status:** 🟡 EM ANDAMENTO
 **Tipo:** Documento de trabalho (MVP inicial)
 
-**Última atualização:** 2025-12-17
+**Última atualização:** 2025-12-19
 **Sprint/Fase:** Fase 1 - Foundation / Auth + Core Finance
 
 ---
@@ -12,11 +12,11 @@
 
 | Categoria |  Total | Concluído | Parcial | Pendente | Bloqueado |
 | --------- | -----: | --------: | ------: | -------: | --------: |
-| Backend   |      6 |         1 |       0 |        5 |         0 |
+| Backend   |      6 |         3 |       0 |        3 |         0 |
 | Frontend  |      6 |         0 |       0 |        6 |         0 |
-| DevOps    |      3 |         0 |       0 |        3 |         0 |
+| DevOps    |      3 |         1 |       0 |        2 |         0 |
 | Testes    |      4 |         0 |       0 |        4 |         0 |
-| **TOTAL** | **19** |     **1** |   **0** |   **18** |     **0** |
+| **TOTAL** | **19** |     **4** |   **0** |   **15** |     **0** |
 
 ### 🎯 Principais objetivos
 
@@ -60,18 +60,20 @@
   - **Arquivos:** `prisma/schema.prisma`, `prisma/migrations/20251219155736_bkd_002_models/migration.sql`, `prisma/seed.ts`, `src/generated/prisma/*`
   - **Notas:** Modelos reais adicionados (User/Account/Session/Verification + Card/Subscription/Transaction com enums `TransactionType` e `CardType`, valores em `Decimal(12,2)`, relacionamentos com card/subscription). Migration gerada via `prisma migrate diff --from-empty` (pode exigir recriar schema ao aplicar). Seed cria usuário `test@example.com`/`Test123!`, cartão demo, assinatura e transações base.
 
-- [ ] **BKD-003** - CRUD Transações (Server Functions)
+- [x] **BKD-003** - CRUD Transações (Server Functions)
   - **Subtasks:**
-    - [ ] **BKD-003.a** - Design dos endpoints e contratos (list, create, update, delete, filtros) — 1h
-    - [ ] **BKD-003.b** - Implementar `GET /transactions` loader/serverFn com filtros por mês/ano — 2h
-    - [ ] **BKD-003.c** - Implementar `POST /transactions` (validações + criação) — 1.5h
-    - [ ] **BKD-003.d** - Implementar `PUT /transactions/:id` e `DELETE /transactions/:id` — 1.5h
-    - [ ] **BKD-003.e** - Integrar loaders ao TanStack Router e cache com QueryClient — 1h
-    - [ ] **BKD-003.f** - Testes de integração E2E para CRUD (end-to-end) — 3h
+    - [x] **BKD-003.a** - Design dos endpoints e contratos (list, create, update, delete, filtros) — 1h
+    - [x] **BKD-003.b** - Implementar `GET /transactions` loader/serverFn com filtros por mês/ano — 2h
+    - [x] **BKD-003.c** - Implementar `POST /transactions` (validações + criação) — 1.5h
+    - [x] **BKD-003.d** - Implementar `PUT /transactions/:id` e `DELETE /transactions/:id` — 1.5h
+    - [x] **BKD-003.e** - Integrar loaders ao TanStack Router e cache com QueryClient — 1h
+    - [x] **BKD-003.f** - Testes de integração E2E para CRUD (end-to-end) — 3h
   - **Prioridade:** 🔴 Crítica
   - **Estimativa (total):** 10h
   - **Dependências:** BKD-002, BKD-001 (auth)
   - **Arquivos:** `src/routes/transactions.server.ts`, `src/routes/transactions.*`
+  - **Contratos (BKD-003.a):** Server Functions RESTful (`GET/POST/PUT/DELETE /transactions`) com validação via Zod. Filtros `month/year/type/category/cardId/subscriptionId`, paginação `page/perPage (<=50)`, ordenação `date desc`. DTO inclui `id, type, value (number), description, category, date ISO, cardId, subscriptionId, createdAt, updatedAt`. Respostas de mutação trazem `balanceDelta` (CREDIT = +value, DEBIT = -value; updates retornam delta entre antes/depois; delete retorna inverso do impacto original). Erros: `VALIDATION_ERROR`, `UNAUTHORIZED`, `TRANSACTION_NOT_FOUND`, `FORBIDDEN`, `FOREIGN_RELATION_INVALID`.
+  - **Entrega:** Server Functions (`list/create/update/deleteTransaction`) em `src/routes/transactions.server.ts` com validação e ownership; rota `/transactions` usando loader + QueryClient cache em `src/routes/transactions.tsx`. Testes unitários + integração (`tests/unit/transactions.server.test.ts`, `tests/integration/transactions.e2e.test.ts`) executados no CI (`.github/workflows/ci.yml`).
 
 - [ ] **BKD-004** - Cartões lógicos (armazenamento criptografado)
   - [ ] Implementar criptografia AES para `encryptedNumber` (chave via env var)
@@ -155,11 +157,12 @@
   - **Estimativa:** 30 min
   - **Dependências:** DEVOPS-001
 
-- [ ] **DEVOPS-003** - CI básico (lint + test)
-  - [ ] Workflow que roda `npm run lint` e `npm run test` em PRs
+- [x] **DEVOPS-003** - CI básico (lint + test)
+  - [x] Workflow que roda `npm run lint`, `npm test` e `npm run build` em PRs e main (`.github/workflows/ci.yml`, Node 20)
   - **Prioridade:** 🟡 Alta
-  - **Estimativa:** 2h
+  - **Estimativa:** 2h | **Real:** ~1h
   - **Dependências:** nenhum
+  - **Notas:** Inclui envs mínimos para build/test (`VITE_DATABASE_URL`, `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL`). Ajustar para Neon/produção conforme necessário.
 
 ## 🧪 TESTES
 

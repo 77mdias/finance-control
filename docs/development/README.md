@@ -39,3 +39,8 @@ O documento arquivado [docs/references/PHASE-1.md](../references/PHASE-1.md) é 
 - Evite editar documentos arquivados em `docs/references/`.
 - Prefira tasks pequenas (≤ 1 dia), com checklist claro.
 - Ao concluir, marque `[x]` e registre decisão relevante (1–3 bullets) dentro da própria task.
+
+## CI/CD rápido
+
+- Workflow GitHub Actions em `.github/workflows/ci.yml` roda `npm ci`, `npm run lint`, `npm test` e `npm run build` em Node 20.
+- Variáveis mínimas já setadas para build/test (`VITE_DATABASE_URL`, `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL`); ajuste se precisar de integrações reais (Neon, Better Auth).
