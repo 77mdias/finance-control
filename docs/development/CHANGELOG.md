@@ -10,6 +10,9 @@ O formato é inspirado em _Keep a Changelog_.
 
 ### Added
 
+- Documentação organizacional em `/docs`: arquitetura (`docs/architecture/README.md`), API (`docs/api/README.md`), segurança (`docs/security/README.md`), bibliotecas (`docs/libraries/README.md`) e operações/health (`docs/operations/*`).
+- Rotas de documentação de API: `/docs/openapi.json` (OpenAPI 3.1) e UI Swagger em `/docs`, controladas por `ENABLE_API_DOCS`.
+- Guia `docs/development/API-DOCS.md` com fluxo de habilitação (on/auth), segurança via cookie Better Auth e endpoints cobertos.
 - Assinaturas backend: Server Functions (`src/server/subscriptions.server.ts`), job mensal idempotente (`src/jobs/subscriptions.ts`) e testes (`tests/unit/subscriptions.server.test.ts`) cobrindo geração automática de transações.
 - Agendamento para Vercel (`vercel.json`) chamando `/api/subscriptions/cron` diariamente às 06:00 UTC (header `x-vercel-cron`).
 - Criptografia AES-256-GCM para cartões lógicos (`src/lib/crypto.ts`) com chave `CARD_ENCRYPTION_KEY` (plain/hex/base64).
@@ -18,8 +21,8 @@ O formato é inspirado em _Keep a Changelog_.
 
 ### Changed
 
-- `.env.example` documenta `CARD_ENCRYPTION_KEY` e exemplo base64.
-- `docs/development/TASKS/PHASE-1-MVP.md` marca BKD-004/BKD-005 como concluídas e ajusta progresso.
+- `.env.example` documenta `CARD_ENCRYPTION_KEY` (exemplo base64) e adiciona `ENABLE_API_DOCS` com modos `on/auth`.
+- `docs/development/TASKS/PHASE-1-MVP.md` marca BKD-004/BKD-006 como concluídas e ajusta progresso.
 
 ## [2025-12-19]
 

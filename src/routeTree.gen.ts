@@ -11,7 +11,9 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as TransactionsRouteImport } from './routes/transactions'
 import { Route as McpRouteImport } from './routes/mcp'
+import { Route as DocsRouteImport } from './routes/docs'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as DocsFileRouteImport } from './routes/docs/$file'
 import { Route as ApiSubscriptionsCronRouteImport } from './routes/api/subscriptions/cron'
 import { Route as ApiAuthChar91DotDotChar93RouteImport } from './routes/api/auth/[...]'
 
@@ -25,10 +27,20 @@ const McpRoute = McpRouteImport.update({
   path: '/mcp',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DocsRoute = DocsRouteImport.update({
+  id: '/docs',
+  path: '/docs',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const DocsFileRoute = DocsFileRouteImport.update({
+  id: '/$file',
+  path: '/$file',
+  getParentRoute: () => DocsRoute,
 } as any)
 const ApiSubscriptionsCronRoute = ApiSubscriptionsCronRouteImport.update({
   id: '/api/subscriptions/cron',
@@ -44,23 +56,29 @@ const ApiAuthChar91DotDotChar93Route =
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/docs': typeof DocsRouteWithChildren
   '/mcp': typeof McpRoute
   '/transactions': typeof TransactionsRoute
+  '/docs/$file': typeof DocsFileRoute
   '/api/subscriptions/cron': typeof ApiSubscriptionsCronRoute
   '/api/auth/[./.]': typeof ApiAuthChar91DotDotChar93Route
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/docs': typeof DocsRouteWithChildren
   '/mcp': typeof McpRoute
   '/transactions': typeof TransactionsRoute
+  '/docs/$file': typeof DocsFileRoute
   '/api/subscriptions/cron': typeof ApiSubscriptionsCronRoute
   '/api/auth/[./.]': typeof ApiAuthChar91DotDotChar93Route
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/docs': typeof DocsRouteWithChildren
   '/mcp': typeof McpRoute
   '/transactions': typeof TransactionsRoute
+  '/docs/$file': typeof DocsFileRoute
   '/api/subscriptions/cron': typeof ApiSubscriptionsCronRoute
   '/api/auth/[./.]': typeof ApiAuthChar91DotDotChar93Route
 }
@@ -68,28 +86,35 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/docs'
     | '/mcp'
     | '/transactions'
+    | '/docs/$file'
     | '/api/subscriptions/cron'
     | '/api/auth/[./.]'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/docs'
     | '/mcp'
     | '/transactions'
+    | '/docs/$file'
     | '/api/subscriptions/cron'
     | '/api/auth/[./.]'
   id:
     | '__root__'
     | '/'
+    | '/docs'
     | '/mcp'
     | '/transactions'
+    | '/docs/$file'
     | '/api/subscriptions/cron'
     | '/api/auth/[./.]'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  DocsRoute: typeof DocsRouteWithChildren
   McpRoute: typeof McpRoute
   TransactionsRoute: typeof TransactionsRoute
   ApiSubscriptionsCronRoute: typeof ApiSubscriptionsCronRoute
@@ -112,12 +137,26 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof McpRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/docs': {
+      id: '/docs'
+      path: '/docs'
+      fullPath: '/docs'
+      preLoaderRoute: typeof DocsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/docs/$file': {
+      id: '/docs/$file'
+      path: '/$file'
+      fullPath: '/docs/$file'
+      preLoaderRoute: typeof DocsFileRouteImport
+      parentRoute: typeof DocsRoute
     }
     '/api/subscriptions/cron': {
       id: '/api/subscriptions/cron'
@@ -136,8 +175,19 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface DocsRouteChildren {
+  DocsFileRoute: typeof DocsFileRoute
+}
+
+const DocsRouteChildren: DocsRouteChildren = {
+  DocsFileRoute: DocsFileRoute,
+}
+
+const DocsRouteWithChildren = DocsRoute._addFileChildren(DocsRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  DocsRoute: DocsRouteWithChildren,
   McpRoute: McpRoute,
   TransactionsRoute: TransactionsRoute,
   ApiSubscriptionsCronRoute: ApiSubscriptionsCronRoute,

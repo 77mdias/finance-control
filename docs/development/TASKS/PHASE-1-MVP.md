@@ -12,11 +12,11 @@
 
 | Categoria |  Total | Concluído | Parcial | Pendente | Bloqueado |
 | --------- | -----: | --------: | ------: | -------: | --------: |
-| Backend   |      6 |         5 |       0 |        1 |         0 |
+| Backend   |      6 |         6 |       0 |        0 |         0 |
 | Frontend  |      6 |         0 |       0 |        6 |         0 |
 | DevOps    |      3 |         1 |       0 |        2 |         0 |
 | Testes    |      4 |         0 |       0 |        4 |         0 |
-| **TOTAL** | **19** |     **6** |   **0** |   **13** |     **0** |
+| **TOTAL** | **19** |     **7** |   **0** |   **12** |     **0** |
 
 ### 🎯 Principais objetivos
 
@@ -94,11 +94,13 @@
   - **Dependências:** BKD-002, BKD-003
   - **Arquivos:** `src/jobs/subscriptions.ts`, `src/server/subscriptions.server.ts`, `tests/unit/subscriptions.server.test.ts`
 
-- [ ] **BKD-006** - OpenAPI / Docs (dev)
-  - [ ] Publicar `GET /docs/openapi.json` e UI dev (auth opt-in). Observação: Server Functions podem não gerar spec automaticamente — documentar contratos ou gerar spec manualmente (Swagger/OpenAPI) para endpoints principais.
+- [x] **BKD-006** - OpenAPI / Docs (dev)
+  - [x] Publicar `GET /docs/openapi.json` e UI dev (auth opt-in) com Swagger UI. Spec manual cobre Auth, Transactions, Cards e Subscriptions.
   - **Prioridade:** 🟡 Alta
-  - **Estimativa:** 2h
+  - **Estimativa:** 2h | **Real:** ~2h
   - **Dependências:** BKD-001
+  - **Arquivos:** `src/lib/openapi.ts`, `src/routes/docs.ts`, `src/routes/docs/$file.ts`, `.env.example`, `docs/development/API-DOCS.md`
+  - **Notas:** Flag `ENABLE_API_DOCS` com modos `on` (livre em dev) e `auth` (exige sessão Better Auth). UI acessível em `/docs` e JSON em `/docs/openapi.json` (sem cache).
 
 ## 🎨 FRONTEND (TanStack Router + React Query)
 
@@ -202,7 +204,7 @@
 - Implementação auth com Server Functions + cookies httpOnly (mais seguro para full-stack TanStack Start).
 - Para dados sensíveis (cartões) usar AES com chave derivada por env var; rotacionar futuramente com Vault.
 - `neon-vite-plugin` é recomendado para dev rápido; `docker-compose` documentado como alternativa.
-- Documentação do API em `BKD-006` deve ser habilitável via flag `ENABLE_API_DOCS`.
+- Documentação do API publicada em `/docs` (Swagger UI) e `/docs/openapi.json`, controlada pela flag `ENABLE_API_DOCS` (`on` ou `auth`).
 
 ---
 
