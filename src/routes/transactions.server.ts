@@ -1,8 +1,8 @@
 import { createServerFn } from '@tanstack/react-start'
 import { z } from 'zod'
+import type { Prisma, PrismaClient, Transaction } from '@/generated/prisma/client'
 import { prisma } from '@/db'
 import { requireUser } from '@/lib/session'
-import type { Prisma, PrismaClient, Transaction } from '@/generated/prisma/client'
 
 const transactionTypeSchema = z.enum(['CREDIT', 'DEBIT'])
 
@@ -27,10 +27,7 @@ const createTransactionSchema = z.object({
 
 const updateTransactionSchema = createTransactionSchema
   .partial()
-  .refine(
-    (data) => Object.values(data).some((value) => value !== undefined),
-    'Nenhum campo para atualizar',
-  )
+  .refine((data) => Object.keys(data).length > 0, 'Nenhum campo para atualizar')
 
 const filterRelationIdSchema = z
   .string()
@@ -81,7 +78,7 @@ type TransactionDto = {
 }
 
 type TransactionsListResponse = {
-  items: TransactionDto[]
+  items: Array<TransactionDto>
   total: number
   page: number
   perPage: number

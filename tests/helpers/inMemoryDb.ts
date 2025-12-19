@@ -17,6 +17,10 @@ type StoredTransaction = {
 type StoredCard = {
   id: string
   userId: string
+  encryptedNumber?: string | null
+  lastDigits?: string | null
+  createdAt?: Date
+  updatedAt?: Date
 }
 
 type StoredSubscription = {
@@ -150,6 +154,54 @@ export class InMemoryDb {
   card = {
     findUnique: async (args: Prisma.CardFindUniqueArgs) => {
       return this.cards.find((card) => card.id === args.where.id) ?? null
+    },
+    findMany: async (args: Prisma.CardFindManyArgs) => {
+      const items = this.cards.filter(
+        (card) => !args.where?.userId || card.userId === args.where?.userId,
+      )
+      const ordered =
+        args.orderBy && 'createdAt' in args.orderBy && args.orderBy.createdAt === 'desc'
+          ? [...items].sort(
+              (a, b) => (b.createdAt?.getTime?.() ?? 0) - (a.createdAt?.getTime?.() ?? 0),
+            )
+          : items
+      return ordered.map((card) => ({
+        ...card,
+        createdAt: card.createdAt ?? new Date(),
+        updatedAt: card.updatedAt ?? new Date(),
+      }))
+    },
+    create: async (args: Prisma.CardCreateArgs) => {
+      const now = new Date()
+      const next: StoredCard = {
+        id: args.data.id as string,
+        userId: args.data.userId as string,
+        encryptedNumber: (args.data.encryptedNumber as string | null | undefined) ?? null,
+        lastDigits: (args.data.lastDigits as string | null | undefined) ?? null,
+      }
+      this.cards.push(next)
+      return { ...next, createdAt: now, updatedAt: now }
+    },
+    update: async (args: Prisma.CardUpdateArgs) => {
+      const index = this.cards.findIndex((card) => card.id === args.where.id)
+      if (index === -1) {
+        throw new Error('Not found')
+      }
+      const existing = this.cards[index]
+      const next: StoredCard = {
+        ...existing,
+        ...args.data,
+        encryptedNumber:
+          args.data.encryptedNumber !== undefined
+            ? ((args.data.encryptedNumber as string | null) ?? null)
+            : existing.encryptedNumber,
+        lastDigits:
+          args.data.lastDigits !== undefined
+            ? ((args.data.lastDigits as string | null) ?? null)
+            : existing.lastDigits,
+      }
+      this.cards[index] = next
+      return { ...next, updatedAt: new Date() }
     },
   }
 

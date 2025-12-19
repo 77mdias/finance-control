@@ -51,9 +51,7 @@ describe('Session Helpers', () => {
     })
 
     it('deve retornar null quando Better Auth lança erro', async () => {
-      vi.mocked(auth.api.getSession).mockRejectedValue(
-        new Error('Session expired'),
-      )
+      vi.mocked(auth.api.getSession).mockRejectedValue(new Error('Session expired'))
 
       const request = new Request('http://localhost', {
         headers: { cookie: 'finance-control-session=expired' },
@@ -128,9 +126,7 @@ describe('Session Helpers', () => {
     })
 
     it('deve retornar null se não há sessão', async () => {
-      vi.mocked(auth.api.getSession).mockRejectedValue(
-        new Error('No session'),
-      )
+      vi.mocked(auth.api.getSession).mockRejectedValue(new Error('No session'))
 
       const request = new Request('http://localhost')
       const result = await getCurrentUser(request)
@@ -195,9 +191,7 @@ describe('Session Helpers', () => {
     })
 
     it('deve lançar erro se sessão inválida', async () => {
-      vi.mocked(auth.api.getSession).mockRejectedValue(
-        new Error('Invalid session'),
-      )
+      vi.mocked(auth.api.getSession).mockRejectedValue(new Error('Invalid session'))
 
       const request = new Request('http://localhost')
 
@@ -215,9 +209,7 @@ describe('Session Helpers', () => {
 
   describe('Integration scenarios', () => {
     it('deve lidar corretamente com request sem headers', async () => {
-      vi.mocked(auth.api.getSession).mockRejectedValue(
-        new Error('No cookies'),
-      )
+      vi.mocked(auth.api.getSession).mockRejectedValue(new Error('No cookies'))
 
       const request = new Request('http://localhost')
 
@@ -246,9 +238,7 @@ describe('Session Helpers', () => {
         },
       }
 
-      vi.mocked(auth.api.getSession).mockResolvedValue(
-        mockComplexSession as any,
-      )
+      vi.mocked(auth.api.getSession).mockResolvedValue(mockComplexSession as any)
 
       const request = new Request('http://localhost', {
         headers: { cookie: 'finance-control-session=complex-token' },

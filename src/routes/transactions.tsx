@@ -1,11 +1,8 @@
-import { useMemo } from 'react'
-import { createFileRoute } from '@tanstack/react-router'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
-import {
-  normalizeTransactionFilters,
-  transactionsQueryOptions,
-  type TransactionsListResponse,
-} from './transactions.server'
+import { createFileRoute } from '@tanstack/react-router'
+import { useMemo } from 'react'
+import { normalizeTransactionFilters, transactionsQueryOptions } from './transactions.server'
+import type { TransactionsListResponse } from './transactions.server'
 
 export const Route = createFileRoute('/transactions')({
   validateSearch: (search) => normalizeTransactionFilters(search),
@@ -25,8 +22,7 @@ function TransactionsPage() {
 
   const { data, isFetching } = useQuery({
     ...queryOptions,
-    initialData: () =>
-      queryClient.getQueryData<TransactionsListResponse>(queryOptions.queryKey),
+    initialData: () => queryClient.getQueryData<TransactionsListResponse>(queryOptions.queryKey),
   })
 
   if (!data) {

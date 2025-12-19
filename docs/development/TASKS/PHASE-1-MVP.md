@@ -12,11 +12,11 @@
 
 | Categoria |  Total | Concluído | Parcial | Pendente | Bloqueado |
 | --------- | -----: | --------: | ------: | -------: | --------: |
-| Backend   |      6 |         3 |       0 |        3 |         0 |
+| Backend   |      6 |         4 |       0 |        2 |         0 |
 | Frontend  |      6 |         0 |       0 |        6 |         0 |
 | DevOps    |      3 |         1 |       0 |        2 |         0 |
 | Testes    |      4 |         0 |       0 |        4 |         0 |
-| **TOTAL** | **19** |     **4** |   **0** |   **15** |     **0** |
+| **TOTAL** | **19** |     **5** |   **0** |   **14** |     **0** |
 
 ### 🎯 Principais objetivos
 
@@ -75,13 +75,14 @@
   - **Contratos (BKD-003.a):** Server Functions RESTful (`GET/POST/PUT/DELETE /transactions`) com validação via Zod. Filtros `month/year/type/category/cardId/subscriptionId`, paginação `page/perPage (<=50)`, ordenação `date desc`. DTO inclui `id, type, value (number), description, category, date ISO, cardId, subscriptionId, createdAt, updatedAt`. Respostas de mutação trazem `balanceDelta` (CREDIT = +value, DEBIT = -value; updates retornam delta entre antes/depois; delete retorna inverso do impacto original). Erros: `VALIDATION_ERROR`, `UNAUTHORIZED`, `TRANSACTION_NOT_FOUND`, `FORBIDDEN`, `FOREIGN_RELATION_INVALID`.
   - **Entrega:** Server Functions (`list/create/update/deleteTransaction`) em `src/routes/transactions.server.ts` com validação e ownership; rota `/transactions` usando loader + QueryClient cache em `src/routes/transactions.tsx`. Testes unitários + integração (`tests/unit/transactions.server.test.ts`, `tests/integration/transactions.e2e.test.ts`) executados no CI (`.github/workflows/ci.yml`).
 
-- [ ] **BKD-004** - Cartões lógicos (armazenamento criptografado)
-  - [ ] Implementar criptografia AES para `encryptedNumber` (chave via env var)
-  - [ ] Expor somente `lastDigits` nas responses; nunca enviar número completo ao cliente
+- [x] **BKD-004** - Cartões lógicos (armazenamento criptografado)
+  - [x] Implementar criptografia AES para `encryptedNumber` (chave via env var)
+  - [x] Expor somente `lastDigits` nas responses; nunca enviar número completo ao cliente
   - **Prioridade:** 🟡 Alta
   - **Estimativa:** 3h
   - **Dependências:** BKD-002
-  - **Arquivos:** `src/lib/crypto.*`, `src/routes/cards.server.ts`
+  - **Arquivos:** `src/lib/crypto.ts`, `src/routes/cards.server.ts`, `tests/unit/cards.server.test.ts`
+  - **Notas:** AES-256-GCM com IV aleatório; chave via `CARD_ENCRYPTION_KEY` suportando plain/hex/base64. Apenas `lastDigits` expostos, número completo nunca sai do backend.
 
 - [ ] **BKD-005** - Assinaturas (geração de transações recorrentes)
   - [ ] Model + job simples que gera transações por assinatura (cron diário mínimo) — job pode rodar em server-side cron ou em worker separado

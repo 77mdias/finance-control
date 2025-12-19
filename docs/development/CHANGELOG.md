@@ -8,6 +8,17 @@ O formato é inspirado em _Keep a Changelog_.
 
 - (adicione aqui mudanças ainda não consolidadas)
 
+### Added
+
+- Criptografia AES-256-GCM para cartões lógicos (`src/lib/crypto.ts`) com chave `CARD_ENCRYPTION_KEY` (plain/hex/base64).
+- Server Functions de cartões (`src/routes/cards.server.ts`) com criação/listagem/atualização expondo apenas `lastDigits`.
+- Testes unitários para cartões (`tests/unit/cards.server.test.ts`) cobrindo criptografia, ownership e ordenação.
+
+### Changed
+
+- `.env.example` documenta `CARD_ENCRYPTION_KEY` e exemplo base64.
+- `docs/development/TASKS/PHASE-1-MVP.md` marca BKD-004 como concluída e ajusta progresso.
+
 ## [2025-12-19]
 
 ### Added
@@ -16,7 +27,7 @@ O formato é inspirado em _Keep a Changelog_.
 - Seed Prisma atualizado com usuário demo (`test@example.com` / `Test123!`), cartão, assinatura e transações iniciais.
 - Server Functions de transações (`list/create/update/deleteTransaction`) com validação Zod e cálculo de `balanceDelta` em `src/routes/transactions.server.ts`.
 - Rota `/transactions` com loader + cache do QueryClient (`src/routes/transactions.tsx`).
- - Testes unitários e de integração para CRUD de transações (`tests/unit/transactions.server.test.ts`, `tests/integration/transactions.e2e.test.ts`) rodando no CI.
+- Testes unitários e de integração para CRUD de transações (`tests/unit/transactions.server.test.ts`, `tests/integration/transactions.e2e.test.ts`) rodando no CI.
 - Workflow de CI em `.github/workflows/ci.yml` (Node 20) executando lint, test e build para PRs e main.
 
 ### Changed

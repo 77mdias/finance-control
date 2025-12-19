@@ -13,3 +13,11 @@ public/robots.txt
 package-lock.json
 yarn.lock
 pnpm-lock.yaml
+.serena/**
+docs/references/**
+src/generated/prisma/**
+src/routeTree.gen.ts
+AGENTS.md
+AGENTS-TEMPLATE.md
+CLAUDE.md
+docs/development/API-AUTH.md
