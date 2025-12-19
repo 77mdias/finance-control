@@ -1,0 +1,12 @@
+# Codebase Structure
+- src/: application code.
+  - src/routes/: file-based routing; __root.tsx is layout, index.tsx is home.
+  - src/components/: shared UI components.
+  - src/lib/: utilities and auth helpers (auth.ts, auth-client.ts, session helpers).
+  - src/integrations/: third-party integrations (e.g., tanstack-query).
+  - src/generated/prisma/: generated Prisma client (non-standard output path).
+- prisma/: schema.prisma and seed.ts.
+- tests/: unit and integration tests (tests/unit, tests/integration) with setup in tests/setup.ts.
+- docs/development/: process docs; tasks live in docs/development/TASKS.
+- public/: static assets.
+- scripts/: helper scripts (e.g., archive-subtask).

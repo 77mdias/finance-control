@@ -1,27 +1,48 @@
-import { PrismaClient } from '@prisma/client'
-// NOTE: The imports below assume the package names used in the plan.
-// Adjust import paths if the actual better-auth package exposes different entry points.
-import betterAuth from 'better-auth'
-import prismaAdapter from 'better-auth/adapters/prisma'
+import { betterAuth } from 'better-auth'
+import { prismaAdapter } from 'better-auth/adapters/prisma'
+import { prisma } from '@/db'
 
-const prisma = new PrismaClient()
-
-// Configuração mínima/placeholder do Better Auth.
-// Ajuste providers, plugins e políticas conforme necessário.
 export const auth = betterAuth({
-  database: prismaAdapter(prisma as any),
-  cookie: {
-    secure: process.env.NODE_ENV === 'production',
-    httpOnly: true,
-    sameSite: 'lax',
+  database: prismaAdapter(prisma, {
+    provider: 'postgresql',
+  }),
+
+  emailAndPassword: {
+    enabled: true,
+    minPasswordLength: 8,
+    requireEmailVerification: false, // MVP: desabilitado inicialmente
   },
-  trustedOrigins: [
-    process.env.NEXT_PUBLIC_BETTER_AUTH_URL ||
-      process.env.VITE_PUBLIC_BETTER_AUTH_URL ||
-      'http://localhost:3000',
-  ],
+
+  user: {
+    additionalFields: {
+      currency: {
+        type: 'string',
+        required: false,
+        defaultValue: 'BRL',
+      },
+      timezone: {
+        type: 'string',
+        required: false,
+        defaultValue: 'America/Sao_Paulo',
+      },
+    },
+  },
+
+  session: {
+    expiresIn: 60 * 60 * 24 * 7, // 7 dias
+    updateAge: 60 * 60 * 24, // Atualiza a cada 1 dia
+  },
+
+  advanced: {
+    cookiePrefix: 'finance-control',
+    crossSubDomainCookies: {
+      enabled: false,
+    },
+  },
+
+  trustedOrigins: [process.env.BETTER_AUTH_URL || 'http://localhost:3000'],
+
+  secret: process.env.BETTER_AUTH_SECRET!,
 })
 
-export type AuthInstance = typeof auth
-
-// TODO: export helpers adicionais (register/login/logout wrappers) conforme necessidade
+export type Auth = typeof auth
