@@ -1,8 +1,8 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { createFileRoute } from '@tanstack/react-router'
 import { useMemo } from 'react'
-import { normalizeTransactionFilters, transactionsQueryOptions } from './transactions.server'
-import type { TransactionsListResponse } from './transactions.server'
+import type { TransactionsListResponse } from '@/server/transactions.server'
+import { normalizeTransactionFilters, transactionsQueryOptions } from '@/server/transactions.server'
 
 export const Route = createFileRoute('/transactions')({
   validateSearch: (search) => normalizeTransactionFilters(search),

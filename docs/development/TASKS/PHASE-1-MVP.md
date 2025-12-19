@@ -71,9 +71,9 @@
   - **Prioridade:** 🔴 Crítica
   - **Estimativa (total):** 10h
   - **Dependências:** BKD-002, BKD-001 (auth)
-  - **Arquivos:** `src/routes/transactions.server.ts`, `src/routes/transactions.*`
+  - **Arquivos:** `src/server/transactions.server.ts`, `src/routes/transactions.*`
   - **Contratos (BKD-003.a):** Server Functions RESTful (`GET/POST/PUT/DELETE /transactions`) com validação via Zod. Filtros `month/year/type/category/cardId/subscriptionId`, paginação `page/perPage (<=50)`, ordenação `date desc`. DTO inclui `id, type, value (number), description, category, date ISO, cardId, subscriptionId, createdAt, updatedAt`. Respostas de mutação trazem `balanceDelta` (CREDIT = +value, DEBIT = -value; updates retornam delta entre antes/depois; delete retorna inverso do impacto original). Erros: `VALIDATION_ERROR`, `UNAUTHORIZED`, `TRANSACTION_NOT_FOUND`, `FORBIDDEN`, `FOREIGN_RELATION_INVALID`.
-  - **Entrega:** Server Functions (`list/create/update/deleteTransaction`) em `src/routes/transactions.server.ts` com validação e ownership; rota `/transactions` usando loader + QueryClient cache em `src/routes/transactions.tsx`. Testes unitários + integração (`tests/unit/transactions.server.test.ts`, `tests/integration/transactions.e2e.test.ts`) executados no CI (`.github/workflows/ci.yml`).
+  - **Entrega:** Server Functions (`list/create/update/deleteTransaction`) em `src/server/transactions.server.ts` com validação e ownership; rota `/transactions` usando loader + QueryClient cache em `src/routes/transactions.tsx`. Testes unitários + integração (`tests/unit/transactions.server.test.ts`, `tests/integration/transactions.e2e.test.ts`) executados no CI (`.github/workflows/ci.yml`).
 
 - [x] **BKD-004** - Cartões lógicos (armazenamento criptografado)
   - [x] Implementar criptografia AES para `encryptedNumber` (chave via env var)
@@ -81,7 +81,7 @@
   - **Prioridade:** 🟡 Alta
   - **Estimativa:** 3h
   - **Dependências:** BKD-002
-  - **Arquivos:** `src/lib/crypto.ts`, `src/routes/cards.server.ts`, `tests/unit/cards.server.test.ts`
+  - **Arquivos:** `src/lib/crypto.ts`, `src/server/cards.server.ts`, `tests/unit/cards.server.test.ts`
   - **Notas:** AES-256-GCM com IV aleatório; chave via `CARD_ENCRYPTION_KEY` suportando plain/hex/base64. Apenas `lastDigits` expostos, número completo nunca sai do backend.
 
 - [x] **BKD-005** - Assinaturas (geração de transações recorrentes)
@@ -92,7 +92,7 @@
   - **Prioridade:** 🟡 Alta
   - **Estimativa:** 4h
   - **Dependências:** BKD-002, BKD-003
-  - **Arquivos:** `src/jobs/subscriptions.ts`, `src/routes/subscriptions.server.ts`, `tests/unit/subscriptions.server.test.ts`
+  - **Arquivos:** `src/jobs/subscriptions.ts`, `src/server/subscriptions.server.ts`, `tests/unit/subscriptions.server.test.ts`
 
 - [ ] **BKD-006** - OpenAPI / Docs (dev)
   - [ ] Publicar `GET /docs/openapi.json` e UI dev (auth opt-in). Observação: Server Functions podem não gerar spec automaticamente — documentar contratos ou gerar spec manualmente (Swagger/OpenAPI) para endpoints principais.

@@ -1,7 +1,6 @@
 import { createServerFn } from '@tanstack/react-start'
 import { z } from 'zod'
 import type { PrismaClient, Subscription } from '@/generated/prisma/client'
-import { prisma } from '@/db'
 import { requireUser } from '@/lib/session'
 
 const relationIdSchema = z
@@ -80,6 +79,14 @@ function mapSubscription(subscription: Subscription): SubscriptionDto {
   }
 }
 
+async function getSubscriptionsClient(): Promise<SubscriptionsClient> {
+  if (!import.meta.env.SSR) {
+    throw new SubscriptionsError(500, 'SERVER_ONLY', 'Função disponível apenas no servidor')
+  }
+  const { prisma } = await import('@/db')
+  return prisma
+}
+
 async function assertCardOwnership(
   db: SubscriptionsClient,
   userId: string,
@@ -102,11 +109,12 @@ async function assertCardOwnership(
 export async function createSubscriptionForUser(
   userId: string,
   input: SubscriptionInput,
-  db: SubscriptionsClient = prisma,
+  db?: SubscriptionsClient,
 ) {
-  await assertCardOwnership(db, userId, input.cardId ?? undefined)
+  const client = db ?? (await getSubscriptionsClient())
+  await assertCardOwnership(client, userId, input.cardId ?? undefined)
 
-  const created = await db.subscription.create({
+  const created = await client.subscription.create({
     data: {
       userId,
       name: input.name,
@@ -124,9 +132,10 @@ export async function updateSubscriptionForUser(
   userId: string,
   id: string,
   updates: SubscriptionUpdateInput,
-  db: SubscriptionsClient = prisma,
+  db?: SubscriptionsClient,
 ) {
-  const existing = await db.subscription.findUnique({ where: { id } })
+  const client = db ?? (await getSubscriptionsClient())
+  const existing = await client.subscription.findUnique({ where: { id } })
   if (!existing) {
     throw new SubscriptionsError(404, 'SUBSCRIPTION_NOT_FOUND', 'Assinatura não encontrada')
   }
@@ -134,7 +143,7 @@ export async function updateSubscriptionForUser(
     throw new SubscriptionsError(403, 'FORBIDDEN', 'Assinatura não pertence ao usuário')
   }
 
-  await assertCardOwnership(db, userId, updates.cardId ?? undefined)
+  await assertCardOwnership(client, userId, updates.cardId ?? undefined)
 
   const data = {
     ...(updates.name ? { name: updates.name } : {}),
@@ -147,7 +156,7 @@ export async function updateSubscriptionForUser(
     Object.assign(data, { cardId: updates.cardId })
   }
 
-  const updated = await db.subscription.update({
+  const updated = await client.subscription.update({
     where: { id },
     data,
   })
@@ -157,9 +166,10 @@ export async function updateSubscriptionForUser(
 
 export async function listSubscriptionsForUser(
   userId: string,
-  db: SubscriptionsClient = prisma,
+  db?: SubscriptionsClient,
 ): Promise<Array<SubscriptionDto>> {
-  const subscriptions = await db.subscription.findMany({
+  const client = db ?? (await getSubscriptionsClient())
+  const subscriptions = await client.subscription.findMany({
     where: { userId },
     orderBy: { createdAt: 'desc' },
   })

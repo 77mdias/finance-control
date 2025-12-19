@@ -1,7 +1,6 @@
 import { createServerFn } from '@tanstack/react-start'
 import { z } from 'zod'
 import type { Prisma, PrismaClient, Transaction } from '@/generated/prisma/client'
-import { prisma } from '@/db'
 import { requireUser } from '@/lib/session'
 
 const transactionTypeSchema = z.enum(['CREDIT', 'DEBIT'])
@@ -119,6 +118,14 @@ function normalizeFilters(filters?: Partial<TransactionsFilters>): TransactionsF
   return listTransactionsSchema.parse(filters ?? {})
 }
 
+async function getTransactionsClient(): Promise<TransactionsClient> {
+  if (!import.meta.env.SSR) {
+    throw new TransactionsError(500, 'SERVER_ONLY', 'Função disponível apenas no servidor')
+  }
+  const { prisma } = await import('@/db')
+  return prisma
+}
+
 function mapTransaction(transaction: Transaction): TransactionDto {
   return {
     id: transaction.id,
@@ -189,8 +196,9 @@ async function assertRelationsOwnership(
 export async function listTransactionsForUser(
   userId: string,
   filters: Partial<TransactionsFilters>,
-  db: TransactionsClient = prisma,
+  db?: TransactionsClient,
 ): Promise<TransactionsListResponse> {
+  const client = db ?? (await getTransactionsClient())
   const parsedFilters = normalizeFilters(filters)
   const where: Prisma.TransactionWhereInput = {
     userId,
@@ -209,13 +217,13 @@ export async function listTransactionsForUser(
   const skip = (parsedFilters.page - 1) * parsedFilters.perPage
 
   const [items, total] = await Promise.all([
-    db.transaction.findMany({
+    client.transaction.findMany({
       where,
       orderBy: [{ date: 'desc' }, { createdAt: 'desc' }],
       skip,
       take: parsedFilters.perPage,
     }),
-    db.transaction.count({ where }),
+    client.transaction.count({ where }),
   ])
 
   const hasNextPage = parsedFilters.page * parsedFilters.perPage < total
@@ -233,14 +241,15 @@ export async function listTransactionsForUser(
 export async function createTransactionForUser(
   userId: string,
   input: TransactionInput,
-  db: TransactionsClient = prisma,
+  db?: TransactionsClient,
 ) {
-  await assertRelationsOwnership(db, userId, {
+  const client = db ?? (await getTransactionsClient())
+  await assertRelationsOwnership(client, userId, {
     cardId: input.cardId ?? undefined,
     subscriptionId: input.subscriptionId ?? undefined,
   })
 
-  const created = await db.transaction.create({
+  const created = await client.transaction.create({
     data: {
       ...input,
       userId,
@@ -257,9 +266,10 @@ export async function updateTransactionForUser(
   userId: string,
   id: string,
   updates: TransactionUpdateInput,
-  db: TransactionsClient = prisma,
+  db?: TransactionsClient,
 ) {
-  const existing = await db.transaction.findUnique({ where: { id } })
+  const client = db ?? (await getTransactionsClient())
+  const existing = await client.transaction.findUnique({ where: { id } })
   if (!existing) {
     throw new TransactionsError(404, 'TRANSACTION_NOT_FOUND', 'Transação não encontrada')
   }
@@ -267,7 +277,7 @@ export async function updateTransactionForUser(
     throw new TransactionsError(403, 'FORBIDDEN', 'Transação não pertence ao usuário')
   }
 
-  await assertRelationsOwnership(db, userId, {
+  await assertRelationsOwnership(client, userId, {
     cardId: updates.cardId ?? undefined,
     subscriptionId: updates.subscriptionId ?? undefined,
   })
@@ -287,7 +297,7 @@ export async function updateTransactionForUser(
     data.subscriptionId = updates.subscriptionId
   }
 
-  const updated = await db.transaction.update({
+  const updated = await client.transaction.update({
     where: { id },
     data,
   })
@@ -305,9 +315,10 @@ export async function updateTransactionForUser(
 export async function deleteTransactionForUser(
   userId: string,
   id: string,
-  db: TransactionsClient = prisma,
+  db?: TransactionsClient,
 ) {
-  const existing = await db.transaction.findUnique({ where: { id } })
+  const client = db ?? (await getTransactionsClient())
+  const existing = await client.transaction.findUnique({ where: { id } })
   if (!existing) {
     throw new TransactionsError(404, 'TRANSACTION_NOT_FOUND', 'Transação não encontrada')
   }
@@ -315,7 +326,7 @@ export async function deleteTransactionForUser(
     throw new TransactionsError(403, 'FORBIDDEN', 'Transação não pertence ao usuário')
   }
 
-  const removed = await db.transaction.delete({ where: { id } })
+  const removed = await client.transaction.delete({ where: { id } })
   const balanceDelta = -calculateBalanceDelta(removed.type, Number(removed.value))
 
   return {

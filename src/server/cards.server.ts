@@ -1,7 +1,6 @@
 import { createServerFn } from '@tanstack/react-start'
 import { z } from 'zod'
 import type { Card, PrismaClient } from '@/generated/prisma/client'
-import { prisma } from '@/db'
 import { encryptCardNumber, lastDigits, sanitizeCardNumber } from '@/lib/crypto'
 import { requireUser } from '@/lib/session'
 
@@ -69,18 +68,23 @@ function mapCard(card: Card): CardDto {
   }
 }
 
-export async function createCardForUser(
-  userId: string,
-  input: CardInput,
-  db: CardsClient = prisma,
-) {
+async function getCardsClient(): Promise<CardsClient> {
+  if (!import.meta.env.SSR) {
+    throw new CardsError(500, 'SERVER_ONLY', 'Função disponível apenas no servidor')
+  }
+  const { prisma } = await import('@/db')
+  return prisma
+}
+
+export async function createCardForUser(userId: string, input: CardInput, db?: CardsClient) {
+  const client = db ?? (await getCardsClient())
   const sanitizedNumber = sanitizeCardNumber(input.number)
   if (sanitizedNumber.length < 8) {
     throw new CardsError(400, 'VALIDATION_ERROR', 'Número do cartão inválido')
   }
 
   const encryptedNumber = encryptCardNumber(sanitizedNumber)
-  const card = await db.card.create({
+  const card = await client.card.create({
     data: {
       name: input.name,
       type: input.type,
@@ -94,12 +98,9 @@ export async function createCardForUser(
   return mapCard(card)
 }
 
-export async function updateCardForUser(
-  userId: string,
-  input: CardUpdateInput,
-  db: CardsClient = prisma,
-) {
-  const existing = await db.card.findUnique({ where: { id: input.id } })
+export async function updateCardForUser(userId: string, input: CardUpdateInput, db?: CardsClient) {
+  const client = db ?? (await getCardsClient())
+  const existing = await client.card.findUnique({ where: { id: input.id } })
   if (!existing) {
     throw new CardsError(404, 'CARD_NOT_FOUND', 'Cartão não encontrado')
   }
@@ -107,7 +108,7 @@ export async function updateCardForUser(
     throw new CardsError(403, 'FORBIDDEN', 'Cartão não pertence ao usuário')
   }
 
-  const updated = await db.card.update({
+  const updated = await client.card.update({
     where: { id: input.id },
     data: {
       ...(input.name ? { name: input.name } : {}),
@@ -118,11 +119,9 @@ export async function updateCardForUser(
   return mapCard(updated)
 }
 
-export async function listCardsForUser(
-  userId: string,
-  db: CardsClient = prisma,
-): Promise<Array<CardDto>> {
-  const cards = await db.card.findMany({
+export async function listCardsForUser(userId: string, db?: CardsClient): Promise<Array<CardDto>> {
+  const client = db ?? (await getCardsClient())
+  const cards = await client.card.findMany({
     where: { userId },
     orderBy: { createdAt: 'desc' },
   })

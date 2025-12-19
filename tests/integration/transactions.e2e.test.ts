@@ -5,7 +5,7 @@ import {
   listTransactionsForUser,
   updateTransactionForUser,
   type TransactionsClient,
-} from '@/routes/transactions.server'
+} from '@/server/transactions.server'
 import { InMemoryDb } from '../helpers/inMemoryDb'
 
 describe('transactions E2E flow', () => {

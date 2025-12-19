@@ -9,7 +9,7 @@ import {
   listSubscriptionsForUser,
   updateSubscriptionForUser,
   type SubscriptionsClient,
-} from '@/routes/subscriptions.server'
+} from '@/server/subscriptions.server'
 import { InMemoryDb } from '../helpers/inMemoryDb'
 
 describe('subscriptions server functions', () => {

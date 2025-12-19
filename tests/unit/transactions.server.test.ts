@@ -7,7 +7,7 @@ import {
   normalizeTransactionFilters,
   updateTransactionForUser,
   type TransactionsClient,
-} from '@/routes/transactions.server'
+} from '@/server/transactions.server'
 import { InMemoryDb } from '../helpers/inMemoryDb'
 
 describe('transactions server functions', () => {

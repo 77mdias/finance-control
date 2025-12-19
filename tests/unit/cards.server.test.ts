@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest'
-import { createCardForUser, listCardsForUser, updateCardForUser } from '@/routes/cards.server'
+import { createCardForUser, listCardsForUser, updateCardForUser } from '@/server/cards.server'
 import { InMemoryDb } from '../helpers/inMemoryDb'
 
 vi.stubEnv('CARD_ENCRYPTION_KEY', 'base64:' + Buffer.alloc(32, 1).toString('base64'))
