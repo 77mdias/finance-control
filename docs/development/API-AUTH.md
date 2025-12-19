@@ -40,7 +40,7 @@ Registro de novo usuário.
     "email": "joao@example.com",
     "currency": "BRL",
     "timezone": "America/Sao_Paulo",
-    "emailVerified": null,
+    "emailVerified": false,
     "image": null,
     "createdAt": "2025-12-17T...",
     "updatedAt": "2025-12-17T..."

@@ -51,13 +51,14 @@
   - **Arquivos implementados:** `src/lib/auth.ts`, `src/lib/auth-client.ts`, `src/lib/session.ts`, `src/routes/api/auth/[...].ts`, `src/db.ts`, `prisma/schema.prisma`, `vitest.config.ts`, `tests/unit/session.test.ts`, `docs/development/API-AUTH.md`
   - **Notas:** Implementação usando Better Auth diretamente (endpoints prontos). Testes de integração pendentes (requerem banco configurado). Seed pendente (requer `.env.local` com DATABASE_URL).
 
-- [ ] **BKD-002** - Models Prisma: User, Transaction, Card, Subscription
-  - [ ] Atualizar `prisma/schema.prisma` com modelos básicos descritos no `PRD.md`
-  - [ ] Gerar migration e seeds mínimos (usar `prisma migrate dev` / seed automático no Neon dev)
+- [x] **BKD-002** - Models Prisma: User, Transaction, Card, Subscription
+  - [x] Atualizar `prisma/schema.prisma` com modelos básicos descritos no `PRD.md`
+  - [x] Gerar migration e seeds mínimos (usar `prisma migrate dev` / seed automático no Neon dev)
   - **Prioridade:** 🔴 Crítica
-  - **Estimativa:** 3h
+  - **Estimativa:** 3h | **Real:** ~2h
   - **Dependências:** BKD-001
-  - **Arquivos:** `prisma/schema.prisma`, `prisma/seed.ts`
+  - **Arquivos:** `prisma/schema.prisma`, `prisma/migrations/20251219155736_bkd_002_models/migration.sql`, `prisma/seed.ts`, `src/generated/prisma/*`
+  - **Notas:** Modelos reais adicionados (User/Account/Session/Verification + Card/Subscription/Transaction com enums `TransactionType` e `CardType`, valores em `Decimal(12,2)`, relacionamentos com card/subscription). Migration gerada via `prisma migrate diff --from-empty` (pode exigir recriar schema ao aplicar). Seed cria usuário `test@example.com`/`Test123!`, cartão demo, assinatura e transações base.
 
 - [ ] **BKD-003** - CRUD Transações (Server Functions)
   - **Subtasks:**

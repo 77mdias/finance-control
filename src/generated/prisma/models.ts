@@ -9,8 +9,11 @@
  * 🟢 You can import this file directly.
  */
 export type * from './models/Todo.ts'
-export type * from './models/accounts.ts'
-export type * from './models/sessions.ts'
-export type * from './models/users.ts'
-export type * from './models/verification_tokens.ts'
+export type * from './models/User.ts'
+export type * from './models/Session.ts'
+export type * from './models/Account.ts'
+export type * from './models/Verification.ts'
+export type * from './models/Card.ts'
+export type * from './models/Subscription.ts'
+export type * from './models/Transaction.ts'
 export type * from './commonInputTypes.ts'

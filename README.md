@@ -9,6 +9,17 @@ npm install
 npm run start
 ```
 
+# Docker (dev)
+
+Prereqs: Docker + Docker Compose.
+
+1. `cp .env.example .env` e defina `BETTER_AUTH_SECRET`. Para usar o Postgres local do compose, deixe `VITE_DATABASE_URL`/`DATABASE_URL` como `postgresql://postgres:postgres@localhost:5432/finance_control?schema=public`.
+2. Suba os serviços: `docker compose -f docker-compose.dev.yml up --build`
+3. Rode migrations (em outro terminal): `docker compose -f docker-compose.dev.yml run --rm app npm run db:migrate`
+4. Seed opcional: `docker compose -f docker-compose.dev.yml run --rm app npm run db:seed`
+
+App em `http://localhost:3000`, Postgres exposto em `localhost:5432`.
+
 # Building For Production
 
 To build this application for production:

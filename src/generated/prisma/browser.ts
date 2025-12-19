@@ -23,22 +23,37 @@ export * from './enums.ts';
  */
 export type Todo = Prisma.TodoModel
 /**
- * Model accounts
+ * Model User
  * 
  */
-export type accounts = Prisma.accountsModel
+export type User = Prisma.UserModel
 /**
- * Model sessions
+ * Model Session
  * 
  */
-export type sessions = Prisma.sessionsModel
+export type Session = Prisma.SessionModel
 /**
- * Model users
+ * Model Account
  * 
  */
-export type users = Prisma.usersModel
+export type Account = Prisma.AccountModel
 /**
- * Model verification_tokens
+ * Model Verification
  * 
  */
-export type verification_tokens = Prisma.verification_tokensModel
+export type Verification = Prisma.VerificationModel
+/**
+ * Model Card
+ * 
+ */
+export type Card = Prisma.CardModel
+/**
+ * Model Subscription
+ * 
+ */
+export type Subscription = Prisma.SubscriptionModel
+/**
+ * Model Transaction
+ * 
+ */
+export type Transaction = Prisma.TransactionModel

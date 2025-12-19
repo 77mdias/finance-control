@@ -7,56 +7,144 @@ datasource db {
   provider = "postgresql"
 }
 
+enum TransactionType {
+  CREDIT
+  DEBIT
+}
+
+enum CardType {
+  CREDIT
+  SUBSCRIPTION
+}
+
 model Todo {
   id        Int      @id @default(autoincrement())
   title     String
   createdAt DateTime @default(now())
 }
 
-model accounts {
-  id                  String  @id
-  user_id             String
-  type                String
-  provider            String
-  provider_account_id String
-  refresh_token       String?
-  access_token        String?
-  expires_at          Int?
-  token_type          String?
-  scope               String?
-  id_token            String?
-  session_state       String?
-  users               users   @relation(fields: [user_id], references: [id], onDelete: Cascade)
+model User {
+  id            String         @id @default(cuid())
+  name          String
+  email         String         @unique
+  emailVerified Boolean        @default(false) @map("email_verified")
+  image         String?
+  currency      String         @default("BRL")
+  timezone      String         @default("America/Sao_Paulo")
+  createdAt     DateTime       @default(now()) @map("created_at")
+  updatedAt     DateTime       @updatedAt @map("updated_at")
+  accounts      Account[]
+  sessions      Session[]
+  cards         Card[]
+  transactions  Transaction[]
+  subscriptions Subscription[]
 
-  @@unique([provider, provider_account_id])
+  @@map("users")
 }
 
-model sessions {
-  id            String   @id
-  session_token String   @unique
-  user_id       String
-  expires       DateTime
-  users         users    @relation(fields: [user_id], references: [id], onDelete: Cascade)
+model Session {
+  id        String   @id @default(cuid())
+  token     String   @unique @map("session_token")
+  userId    String   @map("user_id")
+  expiresAt DateTime @map("expires")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  ipAddress String?  @map("ip_address")
+  userAgent String?  @map("user_agent")
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("sessions")
 }
 
-model users {
-  id             String     @id
-  name           String?
-  email          String     @unique
-  email_verified DateTime?
-  image          String?
-  created_at     DateTime   @default(now())
-  updated_at     DateTime
-  currency       String     @default("BRL")
-  timezone       String     @default("America/Sao_Paulo")
-  accounts       accounts[]
-  sessions       sessions[]
+model Account {
+  id                    String    @id @default(cuid())
+  accountId             String    @map("account_id")
+  providerId            String    @map("provider_id")
+  userId                String    @map("user_id")
+  accessToken           String?   @map("access_token")
+  refreshToken          String?   @map("refresh_token")
+  idToken               String?   @map("id_token")
+  accessTokenExpiresAt  DateTime? @map("access_token_expires_at")
+  refreshTokenExpiresAt DateTime? @map("refresh_token_expires_at")
+  scope                 String?
+  password              String?
+  createdAt             DateTime  @default(now()) @map("created_at")
+  updatedAt             DateTime  @updatedAt @map("updated_at")
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([providerId, accountId])
+  @@index([userId])
+  @@map("accounts")
 }
 
-model verification_tokens {
+model Verification {
+  id         String   @id @default(cuid())
   identifier String
-  token      String   @unique
-  expires    DateTime
+  value      String   @map("token")
+  expiresAt  DateTime @map("expires")
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
 
-  @@unique([identifier, token])
+  @@unique([identifier, value])
+  @@map("verification_tokens")
+}
+
+model Card {
+  id              String         @id @default(cuid())
+  userId          String         @map("user_id")
+  name            String
+  type            CardType
+  encryptedNumber String?        @map("encrypted_number")
+  lastDigits      String?        @map("last_digits")
+  color           String?
+  createdAt       DateTime       @default(now()) @map("created_at")
+  updatedAt       DateTime       @updatedAt @map("updated_at")
+  user            User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  transactions    Transaction[]
+  subscriptions   Subscription[]
+
+  @@index([userId])
+  @@map("cards")
+}
+
+model Subscription {
+  id           String        @id @default(cuid())
+  userId       String        @map("user_id")
+  cardId       String?       @map("card_id")
+  name         String
+  value        Decimal       @db.Decimal(12, 2)
+  billingDay   Int           @map("billing_day")
+  active       Boolean       @default(true)
+  createdAt    DateTime      @default(now()) @map("created_at")
+  updatedAt    DateTime      @updatedAt @map("updated_at")
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  card         Card?         @relation(fields: [cardId], references: [id], onDelete: SetNull)
+  transactions Transaction[]
+
+  @@index([userId])
+  @@index([cardId])
+  @@map("subscriptions")
+}
+
+model Transaction {
+  id             String          @id @default(cuid())
+  userId         String          @map("user_id")
+  type           TransactionType
+  value          Decimal         @db.Decimal(12, 2)
+  description    String
+  category       String
+  date           DateTime
+  cardId         String?         @map("card_id")
+  subscriptionId String?         @map("subscription_id")
+  createdAt      DateTime        @default(now()) @map("created_at")
+  updatedAt      DateTime        @updatedAt @map("updated_at")
+  user           User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  card           Card?           @relation(fields: [cardId], references: [id], onDelete: SetNull)
+  subscription   Subscription?   @relation(fields: [subscriptionId], references: [id], onDelete: SetNull)
+
+  @@index([userId, date])
+  @@index([cardId])
+  @@index([subscriptionId])
+  @@map("transactions")
 }

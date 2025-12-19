@@ -8,6 +8,17 @@ O formato é inspirado em _Keep a Changelog_.
 
 - (adicione aqui mudanças ainda não consolidadas)
 
+## [2025-12-19]
+
+### Added
+
+- Migration `20251219155736_bkd_002_models` com criação de enums (`TransactionType`, `CardType`) e tabelas Card/Subscription/Transaction.
+- Seed Prisma atualizado com usuário demo (`test@example.com` / `Test123!`), cartão, assinatura e transações iniciais.
+
+### Changed
+
+- `prisma/schema.prisma` alinhado ao Better Auth (User/Account/Session/Verification) e ao domínio financeiro (valores em Decimal, relacionamentos com card/subscription).
+
 ## [2025-12-17]
 
 ### Added
