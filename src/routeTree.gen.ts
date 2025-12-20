@@ -10,16 +10,28 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as TransactionsRouteImport } from './routes/transactions'
+import { Route as SignupRouteImport } from './routes/signup'
+import { Route as SigninRouteImport } from './routes/signin'
 import { Route as McpRouteImport } from './routes/mcp'
 import { Route as DocsRouteImport } from './routes/docs'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as DocsFileRouteImport } from './routes/docs/$file'
 import { Route as ApiSubscriptionsCronRouteImport } from './routes/api/subscriptions/cron'
-import { Route as ApiAuthChar91DotDotChar93RouteImport } from './routes/api/auth/[...]'
+import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 
 const TransactionsRoute = TransactionsRouteImport.update({
   id: '/transactions',
   path: '/transactions',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SignupRoute = SignupRouteImport.update({
+  id: '/signup',
+  path: '/signup',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SigninRoute = SigninRouteImport.update({
+  id: '/signin',
+  path: '/signin',
   getParentRoute: () => rootRouteImport,
 } as any)
 const McpRoute = McpRouteImport.update({
@@ -47,40 +59,45 @@ const ApiSubscriptionsCronRoute = ApiSubscriptionsCronRouteImport.update({
   path: '/api/subscriptions/cron',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiAuthChar91DotDotChar93Route =
-  ApiAuthChar91DotDotChar93RouteImport.update({
-    id: '/api/auth/[./.]',
-    path: '/api/auth/[./.]',
-    getParentRoute: () => rootRouteImport,
-  } as any)
+const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
+  id: '/api/auth/$',
+  path: '/api/auth/$',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/docs': typeof DocsRouteWithChildren
   '/mcp': typeof McpRoute
+  '/signin': typeof SigninRoute
+  '/signup': typeof SignupRoute
   '/transactions': typeof TransactionsRoute
   '/docs/$file': typeof DocsFileRoute
+  '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/subscriptions/cron': typeof ApiSubscriptionsCronRoute
-  '/api/auth/[./.]': typeof ApiAuthChar91DotDotChar93Route
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/docs': typeof DocsRouteWithChildren
   '/mcp': typeof McpRoute
+  '/signin': typeof SigninRoute
+  '/signup': typeof SignupRoute
   '/transactions': typeof TransactionsRoute
   '/docs/$file': typeof DocsFileRoute
+  '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/subscriptions/cron': typeof ApiSubscriptionsCronRoute
-  '/api/auth/[./.]': typeof ApiAuthChar91DotDotChar93Route
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/docs': typeof DocsRouteWithChildren
   '/mcp': typeof McpRoute
+  '/signin': typeof SigninRoute
+  '/signup': typeof SignupRoute
   '/transactions': typeof TransactionsRoute
   '/docs/$file': typeof DocsFileRoute
+  '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/subscriptions/cron': typeof ApiSubscriptionsCronRoute
-  '/api/auth/[./.]': typeof ApiAuthChar91DotDotChar93Route
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -88,37 +105,45 @@ export interface FileRouteTypes {
     | '/'
     | '/docs'
     | '/mcp'
+    | '/signin'
+    | '/signup'
     | '/transactions'
     | '/docs/$file'
+    | '/api/auth/$'
     | '/api/subscriptions/cron'
-    | '/api/auth/[./.]'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/docs'
     | '/mcp'
+    | '/signin'
+    | '/signup'
     | '/transactions'
     | '/docs/$file'
+    | '/api/auth/$'
     | '/api/subscriptions/cron'
-    | '/api/auth/[./.]'
   id:
     | '__root__'
     | '/'
     | '/docs'
     | '/mcp'
+    | '/signin'
+    | '/signup'
     | '/transactions'
     | '/docs/$file'
+    | '/api/auth/$'
     | '/api/subscriptions/cron'
-    | '/api/auth/[./.]'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   DocsRoute: typeof DocsRouteWithChildren
   McpRoute: typeof McpRoute
+  SigninRoute: typeof SigninRoute
+  SignupRoute: typeof SignupRoute
   TransactionsRoute: typeof TransactionsRoute
+  ApiAuthSplatRoute: typeof ApiAuthSplatRoute
   ApiSubscriptionsCronRoute: typeof ApiSubscriptionsCronRoute
-  ApiAuthChar91DotDotChar93Route: typeof ApiAuthChar91DotDotChar93Route
 }
 
 declare module '@tanstack/react-router' {
@@ -128,6 +153,20 @@ declare module '@tanstack/react-router' {
       path: '/transactions'
       fullPath: '/transactions'
       preLoaderRoute: typeof TransactionsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/signup': {
+      id: '/signup'
+      path: '/signup'
+      fullPath: '/signup'
+      preLoaderRoute: typeof SignupRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/signin': {
+      id: '/signin'
+      path: '/signin'
+      fullPath: '/signin'
+      preLoaderRoute: typeof SigninRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/mcp': {
@@ -165,11 +204,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiSubscriptionsCronRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/auth/[./.]': {
-      id: '/api/auth/[./.]'
-      path: '/api/auth/[./.]'
-      fullPath: '/api/auth/[./.]'
-      preLoaderRoute: typeof ApiAuthChar91DotDotChar93RouteImport
+    '/api/auth/$': {
+      id: '/api/auth/$'
+      path: '/api/auth/$'
+      fullPath: '/api/auth/$'
+      preLoaderRoute: typeof ApiAuthSplatRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
@@ -189,9 +228,11 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   DocsRoute: DocsRouteWithChildren,
   McpRoute: McpRoute,
+  SigninRoute: SigninRoute,
+  SignupRoute: SignupRoute,
   TransactionsRoute: TransactionsRoute,
+  ApiAuthSplatRoute: ApiAuthSplatRoute,
   ApiSubscriptionsCronRoute: ApiSubscriptionsCronRoute,
-  ApiAuthChar91DotDotChar93Route: ApiAuthChar91DotDotChar93Route,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

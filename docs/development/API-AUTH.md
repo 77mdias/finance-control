@@ -7,7 +7,6 @@ A autenticação é implementada usando **Better Auth** com adapter Prisma e pro
 **Características:**
 - Sessões com cookies httpOnly (7 dias de validade)
 - Proteção CSRF integrada
-- Campos customizados: `currency` e `timezone`
 - Validação de senha (mínimo 8 caracteres)
 
 ---
@@ -23,9 +22,7 @@ Registro de novo usuário.
 {
   "name": "João Silva",
   "email": "joao@example.com",
-  "password": "SenhaSegura123!",
-  "currency": "BRL",        // opcional
-  "timezone": "America/Sao_Paulo"  // opcional
+  "password": "SenhaSegura123!"
 }
 ```
 
@@ -38,8 +35,6 @@ Registro de novo usuário.
     "id": "clxxx...",
     "name": "João Silva",
     "email": "joao@example.com",
-    "currency": "BRL",
-    "timezone": "America/Sao_Paulo",
     "emailVerified": false,
     "image": null,
     "createdAt": "2025-12-17T...",
@@ -280,13 +275,11 @@ async function handleSignUp(name: string, email: string, password: string) {
       name,
       email,
       password,
-      currency: 'BRL',
-      timezone: 'America/Sao_Paulo',
     })
 
     if (result.data) {
       // Sucesso
-      router.navigate({ to: '/dashboard' })
+      router.navigate({ to: '/' })
     }
   } catch (error) {
     // Erro
@@ -308,7 +301,7 @@ async function handleSignIn(email: string, password: string) {
     })
 
     if (result.data) {
-      router.navigate({ to: '/dashboard' })
+      router.navigate({ to: '/' })
     }
   } catch (error) {
     console.error('Login failed:', error)
@@ -323,34 +316,13 @@ import { signOut } from '@/lib/auth-client'
 
 async function handleSignOut() {
   await signOut()
-  router.navigate({ to: '/login' })
+  router.navigate({ to: '/signin' })
 }
 ```
 
 ---
 
 ## Proteção de Rotas
-
-### Com loader (Server-side)
-
-```typescript
-import { requireUser } from '@/lib/session'
-import { createFileRoute } from '@tanstack/react-router'
-
-export const Route = createFileRoute('/dashboard')({
-  component: Dashboard,
-  loader: async ({ request }) => {
-    // Redireciona se não autenticado
-    const user = await requireUser(request)
-    return { user }
-  },
-})
-
-function Dashboard() {
-  const { user } = Route.useLoaderData()
-  return <div>Bem-vindo, {user.name}!</div>
-}
-```
 
 ### Com hook (Client-side)
 
@@ -364,7 +336,7 @@ function ProtectedPage() {
   if (isPending) return <div>Carregando...</div>
 
   if (!session) {
-    return <Navigate to="/login" />
+    return <Navigate to="/signin" />
   }
 
   return <div>Conteúdo protegido</div>

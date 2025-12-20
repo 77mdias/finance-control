@@ -12,7 +12,8 @@ services:
       NODE_ENV: development
       VITE_DATABASE_URL: postgresql://postgres:postgres@db:5432/finance_control?schema=public
       DATABASE_URL: postgresql://postgres:postgres@db:5432/finance_control?schema=public
-      BETTER_AUTH_SECRET: change-me
+      # Dev-only secret. Must be >= 32 chars (Better Auth requirement).
+      BETTER_AUTH_SECRET: dev-secret-change-me-dev-secret-change-me
       BETTER_AUTH_URL: http://localhost:3000
     volumes:
       - .:/app

@@ -23,6 +23,8 @@ O formato é inspirado em _Keep a Changelog_.
 
 - `.env.example` documenta `CARD_ENCRYPTION_KEY` (exemplo base64) e adiciona `ENABLE_API_DOCS` com modos `on/auth`.
 - `docs/development/TASKS/PHASE-1-MVP.md` marca BKD-004/BKD-006 como concluídas e ajusta progresso.
+- `docs/development/API-AUTH.md` alinhado para `/signin` e redirect para `/` nos exemplos; removidas menções a `currency/timezone` no fluxo de sign-up do MVP.
+- `docs/development/TASKS/PHASE-1-MVP.md` atualizado com progresso de FE-001/FE-002/FE-006/FE-007.
 
 ## [2025-12-19]
 

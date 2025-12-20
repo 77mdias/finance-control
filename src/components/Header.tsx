@@ -1,4 +1,4 @@
-import { Link } from '@tanstack/react-router'
+import { Link, useRouterState } from '@tanstack/react-router'
 
 import { useState } from 'react'
 import {
@@ -15,6 +15,13 @@ import {
 } from 'lucide-react'
 
 export default function Header() {
+  const pathname = useRouterState({
+    select: (s) => s.location.pathname,
+  })
+
+  const isAuthRoute = pathname === '/signin' || pathname === '/signup'
+  if (isAuthRoute) return null
+
   const [isOpen, setIsOpen] = useState(false)
   const [groupedExpanded, setGroupedExpanded] = useState<Record<string, boolean>>({})
 

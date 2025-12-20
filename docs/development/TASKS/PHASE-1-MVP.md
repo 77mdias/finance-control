@@ -3,7 +3,7 @@
 **Status:** 🟡 EM ANDAMENTO
 **Tipo:** Documento de trabalho (MVP inicial)
 
-**Última atualização:** 2025-12-19
+**Última atualização:** 2025-12-20
 **Sprint/Fase:** Fase 1 - Foundation / Auth + Core Finance
 
 ---
@@ -13,10 +13,10 @@
 | Categoria |  Total | Concluído | Parcial | Pendente | Bloqueado |
 | --------- | -----: | --------: | ------: | -------: | --------: |
 | Backend   |      6 |         6 |       0 |        0 |         0 |
-| Frontend  |      6 |         0 |       0 |        6 |         0 |
+| Frontend  |      7 |         3 |       1 |        3 |         0 |
 | DevOps    |      3 |         1 |       0 |        2 |         0 |
 | Testes    |      4 |         0 |       0 |        4 |         0 |
-| **TOTAL** | **19** |     **7** |   **0** |   **12** |     **0** |
+| **TOTAL** | **20** |    **10** |   **1** |    **9** |     **0** |
 
 ### 🎯 Principais objetivos
 
@@ -104,16 +104,18 @@
 
 ## 🎨 FRONTEND (TanStack Router + React Query)
 
-- [ ] **FE-001** - Layout mínimo + rotas: signin, signup, dashboard
-  - [ ] Páginas: `/signin`, `/signup`, `/`(dashboard)
-  - [ ] Usar TanStack Router loaders para pré-carregar dados e QueryClient para cache
+- [x] **FE-001** - Layout mínimo + rotas: signin, signup, dashboard ✅ **CONCLUÍDO**
+  - [x] Páginas: `/signin`, `/signup`
+  - [x] Página: `/` (dashboard)
+  - [x] Layout auth responsivo (mobile-first) + esconder Header nas rotas de auth
+  - [x] Usar TanStack Router loaders para pré-carregar dados do dashboard
   - **Prioridade:** 🔴 Crítica
   - **Estimativa:** 4h
   - **Dependências:** BKD-001
   - **Arquivos:** `src/routes/*`, `src/components/Header.tsx`
 
-- [ ] **FE-002** - Forms de autenticação (register/login)
-  - [ ] Validações básicas, mensagens de erro amigáveis
+- [x] **FE-002** - Forms de autenticação (register/login) ✅ **CONCLUÍDO**
+  - [x] Validações básicas, mensagens de erro amigáveis
   - **Prioridade:** 🔴 Crítica
   - **Estimativa:** 3h
   - **Dependências:** FE-001
@@ -136,15 +138,16 @@
   - **Estimativa:** 3h
   - **Dependências:** BKD-004
 
-- [ ] **FE-006** - State de autenticação + integração com cookies
-  - [ ] Implementar auth state via loaders/hooks que usam cookies httpOnly; se usar JWT cookie, não será necessário Authorization header para requests via fetch/Server Functions
-  - [ ] Opcional: interceptor para fetch requests que precisem de header CSRF; implementar fallback de refresh (server-side) se necessário
+- [ ] **FE-006** - State de autenticação + integração com cookies 🟡 **PARCIAL**
+  - [x] Auth state via hook `useSession()` (cookies httpOnly)
+  - [x] Redirect client-side para `/` em `/signin` e `/signup` quando autenticado
+  - [ ] Opcional: interceptor/infra de CSRF + refresh server-side se necessário
   - **Prioridade:** 🔴 Crítica
   - **Estimativa:** 3h
   - **Dependências:** BKD-001
 
-- [ ] **FE-007** - Configurar QueryClient + Providers
-  - [ ] Adicionar `QueryClientProvider` e `ReactQueryDevtools`; integrar com TanStack Router loaders
+- [x] **FE-007** - Configurar QueryClient + Providers ✅ **CONCLUÍDO**
+  - [x] Adicionar `QueryClientProvider` e `ReactQueryDevtools`; integrar com TanStack Router (contexto do router)
   - **Prioridade:** 🟡 Alta
   - **Estimativa:** 2h
   - **Dependências:** FE-001
