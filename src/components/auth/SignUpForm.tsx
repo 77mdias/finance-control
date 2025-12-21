@@ -1,47 +1,31 @@
 import { Link, useRouter } from '@tanstack/react-router'
-import { Mail, Shield, User } from 'lucide-react'
+import { Lock, Shield } from 'lucide-react'
 import { useId, useMemo, useState } from 'react'
 
 import { signUp } from '@/lib/auth-client'
+import { LOCAL_AUTH_IDENTIFIER } from '@/lib/auth-constants'
+import { touchUserActivity } from '@/server/auth.server'
 
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 
-function isValidEmail(value: string) {
-  return value.includes('@')
-}
-
 export function SignUpForm() {
   const router = useRouter()
 
-  const nameId = useId()
-  const emailId = useId()
   const passwordId = useId()
 
-  const [name, setName] = useState('')
-  const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [formError, setFormError] = useState<string | null>(null)
 
   const canSubmit = useMemo(() => {
-    return name.trim().length >= 2 && isValidEmail(email) && password.length >= 8 && !isSubmitting
-  }, [email, isSubmitting, name, password.length])
+    return password.length >= 8 && !isSubmitting
+  }, [isSubmitting, password.length])
 
   async function onSubmit(event: React.FormEvent) {
     event.preventDefault()
     setFormError(null)
-
-    if (name.trim().length < 2) {
-      setFormError('Informe seu nome.')
-      return
-    }
-
-    if (!isValidEmail(email)) {
-      setFormError('Informe um e-mail válido.')
-      return
-    }
 
     if (password.length < 8) {
       setFormError('A senha deve ter pelo menos 8 caracteres.')
@@ -51,13 +35,23 @@ export function SignUpForm() {
     setIsSubmitting(true)
     try {
       const result = await signUp.email({
-        name: name.trim(),
-        email,
+        name: 'Owner',
+        email: LOCAL_AUTH_IDENTIFIER,
         password,
       })
 
       if (result.data) {
+        try {
+          await touchUserActivity()
+        } catch {
+          // best-effort metadata update
+        }
         await router.navigate({ to: '/' })
+        return
+      }
+
+      if (result.error?.message?.toLowerCase().includes('unique')) {
+        setFormError('A senha única já foi definida. Use "Entrar" para acessar.')
         return
       }
 
@@ -72,58 +66,30 @@ export function SignUpForm() {
   return (
     <div className="space-y-8">
       <div className="space-y-2">
-        <h1 className="text-3xl font-bold leading-tight sm:text-4xl">Criar conta</h1>
-        <p className="text-base text-muted-foreground">Leva menos de um minuto.</p>
+        <h1 className="text-3xl font-bold leading-tight sm:text-4xl">Definir senha única</h1>
+        <p className="text-base text-muted-foreground">
+          Não há e-mail nem nome. Guarde a senha; sem ela a conta é apagada após 60 dias sem acesso.
+        </p>
       </div>
 
       <form onSubmit={onSubmit} className="space-y-4">
         <div className="space-y-2">
-          <Label htmlFor={nameId}>Nome</Label>
-          <div className="relative">
-            <div className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground">
-              <User className="h-4 w-4" />
-            </div>
-            <Input
-              id={nameId}
-              name="name"
-              autoComplete="name"
-              value={name}
-              onChange={(e) => setName(e.currentTarget.value)}
-              placeholder="Seu nome"
-              className="pl-12"
-            />
-          </div>
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor={emailId}>E-mail</Label>
-          <div className="relative">
-            <div className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground">
-              <Mail className="h-4 w-4" />
-            </div>
-            <Input
-              id={emailId}
-              name="email"
-              autoComplete="email"
-              value={email}
-              onChange={(e) => setEmail(e.currentTarget.value)}
-              placeholder="seu@email.com"
-              className="pl-12"
-            />
-          </div>
-        </div>
-
-        <div className="space-y-2">
           <Label htmlFor={passwordId}>Senha</Label>
-          <Input
-            id={passwordId}
-            name="password"
-            type="password"
-            autoComplete="new-password"
-            value={password}
-            onChange={(e) => setPassword(e.currentTarget.value)}
-            placeholder="••••••••"
-          />
+          <div className="relative">
+            <div className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground">
+              <Lock className="h-4 w-4" />
+            </div>
+            <Input
+              id={passwordId}
+              name="password"
+              type="password"
+              autoComplete="new-password"
+              value={password}
+              onChange={(e) => setPassword(e.currentTarget.value)}
+              placeholder="Defina a senha única"
+              className="pl-12"
+            />
+          </div>
         </div>
 
         {formError ? <div className="text-sm text-destructive">{formError}</div> : null}

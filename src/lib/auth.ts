@@ -25,6 +25,19 @@ export const auth = betterAuth({
         required: false,
         defaultValue: 'America/Sao_Paulo',
       },
+      lastLoginAt: {
+        type: 'date',
+        required: false,
+      },
+      deletionScheduledAt: {
+        type: 'date',
+        required: false,
+      },
+      isDisabled: {
+        type: 'boolean',
+        required: false,
+        defaultValue: false,
+      },
     },
   },
 

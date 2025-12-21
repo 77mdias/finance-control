@@ -25,12 +25,15 @@ model Todo {
 
 model User {
   id            String         @id @default(cuid())
-  name          String
-  email         String         @unique
+  name          String         @default("Owner")
+  email         String         @unique @default("owner@local")
   emailVerified Boolean        @default(false) @map("email_verified")
   image         String?
   currency      String         @default("BRL")
   timezone      String         @default("America/Sao_Paulo")
+  lastLoginAt   DateTime?      @map("last_login_at")
+  deletionScheduledAt DateTime? @map("deletion_scheduled_at")
+  isDisabled    Boolean        @default(false) @map("is_disabled")
   createdAt     DateTime       @default(now()) @map("created_at")
   updatedAt     DateTime       @updatedAt @map("updated_at")
   accounts      Account[]
@@ -40,6 +43,7 @@ model User {
   subscriptions Subscription[]
 
   @@map("users")
+  @@index([deletionScheduledAt])
 }
 
 model Session {

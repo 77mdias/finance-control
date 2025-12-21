@@ -1,40 +1,31 @@
 import { Link, useRouter } from '@tanstack/react-router'
-import { Lock, Mail, Shield } from 'lucide-react'
+import { Lock, Shield } from 'lucide-react'
 import { useId, useMemo, useState } from 'react'
 
 import { signIn } from '@/lib/auth-client'
+import { LOCAL_AUTH_IDENTIFIER } from '@/lib/auth-constants'
+import { touchUserActivity } from '@/server/auth.server'
 
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 
-function isValidEmail(value: string) {
-  return value.includes('@')
-}
-
 export function SignInForm() {
   const router = useRouter()
 
-  const emailId = useId()
   const passwordId = useId()
 
-  const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [formError, setFormError] = useState<string | null>(null)
 
   const canSubmit = useMemo(() => {
-    return isValidEmail(email) && password.length >= 8 && !isSubmitting
-  }, [email, isSubmitting, password.length])
+    return password.length >= 8 && !isSubmitting
+  }, [isSubmitting, password.length])
 
   async function onSubmit(event: React.FormEvent) {
     event.preventDefault()
     setFormError(null)
-
-    if (!isValidEmail(email)) {
-      setFormError('Informe um e-mail válido.')
-      return
-    }
 
     if (password.length < 8) {
       setFormError('A senha deve ter pelo menos 8 caracteres.')
@@ -44,11 +35,16 @@ export function SignInForm() {
     setIsSubmitting(true)
     try {
       const result = await signIn.email({
-        email,
+        email: LOCAL_AUTH_IDENTIFIER,
         password,
       })
 
       if (result.data) {
+        try {
+          await touchUserActivity()
+        } catch {
+          // best-effort metadata update
+        }
         await router.navigate({ to: '/' })
         return
       }
@@ -80,30 +76,15 @@ export function SignInForm() {
             </span>
           </h1>
           <p className="text-base text-muted-foreground">
-            Seus ganhos, gastos e assinaturas em um só lugar.
+            Seus ganhos, gastos e assinaturas em um só lugar. Apenas senha — sem e-mail nem nome.
+          </p>
+          <p className="text-xs text-muted-foreground">
+            Se ficar 60 dias sem acessar, a conta é desativada e apagada.
           </p>
         </div>
       </div>
 
       <form onSubmit={onSubmit} className="space-y-4">
-        <div className="space-y-2">
-          <Label htmlFor={emailId}>E-mail</Label>
-          <div className="relative">
-            <div className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground">
-              <Mail className="h-4 w-4" />
-            </div>
-            <Input
-              id={emailId}
-              name="email"
-              autoComplete="email"
-              value={email}
-              onChange={(e) => setEmail(e.currentTarget.value)}
-              placeholder="seu@email.com"
-              className="pl-12"
-            />
-          </div>
-        </div>
-
         <div className="space-y-2">
           <Label htmlFor={passwordId}>Senha de acesso</Label>
           <div className="relative">
