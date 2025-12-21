@@ -3,7 +3,7 @@
 **Status:** 🟡 EM ANDAMENTO
 **Tipo:** Documento de trabalho (MVP inicial)
 
-**Última atualização:** 2025-12-20
+**Última atualização:** 2025-12-21
 **Sprint/Fase:** Fase 1 - Foundation / Auth + Core Finance
 
 ---
@@ -13,10 +13,10 @@
 | Categoria |  Total | Concluído | Parcial | Pendente | Bloqueado |
 | --------- | -----: | --------: | ------: | -------: | --------: |
 | Backend   |      6 |         6 |       0 |        0 |         0 |
-| Frontend  |      7 |         3 |       1 |        3 |         0 |
+| Frontend  |      7 |         4 |       1 |        2 |         0 |
 | DevOps    |      3 |         1 |       0 |        2 |         0 |
 | Testes    |      4 |         0 |       0 |        4 |         0 |
-| **TOTAL** | **20** |    **10** |   **1** |    **9** |     **0** |
+| **TOTAL** | **20** |    **11** |   **1** |    **8** |     **0** |
 
 ### 🎯 Principais objetivos
 
@@ -120,11 +120,13 @@
   - **Estimativa:** 3h
   - **Dependências:** FE-001
 
-- [ ] **FE-003** - Dashboard básico (saldo, ganhos, gastos)
-  - [ ] Mostrar resumo mensal e lista de transações recentes
+- [x] **FE-003** - Dashboard básico (saldo, ganhos, gastos) ✅ **CONCLUÍDO**
+  - [x] Mostrar resumo mensal e lista de transações recentes
   - **Prioridade:** 🔴 Crítica
   - **Estimativa:** 6h
   - **Dependências:** BKD-003, FE-001
+  - **Arquivos:** `src/routes/index.tsx`, `src/components/dashboard/*`, `src/server/transactions.server.ts`, `src/styles.css`
+  - **Notas:** Layout inspirado no design do Figma, com cards de métricas reutilizáveis e lista de transações recentes.
 
 - [ ] **FE-004** - CRUD transações (UI) e integração com API
   - [ ] Form para criar/editar transações, confirmação de exclusão

@@ -20,7 +20,8 @@ export default function Header() {
   })
 
   const isAuthRoute = pathname === '/signin' || pathname === '/signup'
-  if (isAuthRoute) return null
+  const isDashboardRoute = pathname === '/'
+  if (isAuthRoute || isDashboardRoute) return null
 
   const [isOpen, setIsOpen] = useState(false)
   const [groupedExpanded, setGroupedExpanded] = useState<Record<string, boolean>>({})

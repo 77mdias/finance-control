@@ -58,6 +58,21 @@ const listTransactionsSchema = z
   })
 
 type TransactionsFilters = z.infer<typeof listTransactionsSchema>
+
+const summaryFiltersSchema = z
+  .object({
+    month: z.coerce.number().int().min(1).max(12).optional(),
+    year: z.coerce.number().int().min(2000).max(2100).optional(),
+  })
+  .transform((values) => {
+    const now = new Date()
+    return {
+      month: values.month ?? now.getUTCMonth() + 1,
+      year: values.year ?? now.getUTCFullYear(),
+    }
+  })
+
+type TransactionsSummaryFilters = z.infer<typeof summaryFiltersSchema>
 type TransactionInput = z.infer<typeof createTransactionSchema>
 type TransactionUpdateInput = z.infer<typeof updateTransactionSchema>
 
@@ -83,6 +98,14 @@ type TransactionsListResponse = {
   perPage: number
   hasNextPage: boolean
   appliedFilters: TransactionsFilters
+}
+
+type TransactionsSummary = {
+  income: number
+  expenses: number
+  balance: number
+  month: number
+  year: number
 }
 
 export class TransactionsError extends Error {
@@ -118,6 +141,12 @@ function normalizeFilters(filters?: Partial<TransactionsFilters>): TransactionsF
   return listTransactionsSchema.parse(filters ?? {})
 }
 
+function normalizeSummaryFilters(
+  filters?: Partial<TransactionsSummaryFilters>,
+): TransactionsSummaryFilters {
+  return summaryFiltersSchema.parse(filters ?? {})
+}
+
 async function getTransactionsClient(): Promise<TransactionsClient> {
   if (!import.meta.env.SSR) {
     throw new TransactionsError(500, 'SERVER_ONLY', 'Função disponível apenas no servidor')
@@ -145,7 +174,10 @@ function calculateBalanceDelta(type: TransactionInput['type'], value: number) {
   return type === 'CREDIT' ? value : -value
 }
 
-function getDateFilter(filters: TransactionsFilters): Prisma.DateTimeFilter | undefined {
+function getDateFilter(filters: {
+  month?: number
+  year?: number
+}): Prisma.DateTimeFilter | undefined {
   const { month, year } = filters
   if (month == null && year == null) {
     return undefined
@@ -235,6 +267,37 @@ export async function listTransactionsForUser(
     perPage: parsedFilters.perPage,
     hasNextPage,
     appliedFilters: parsedFilters,
+  }
+}
+
+export async function getTransactionsSummaryForUser(
+  userId: string,
+  filters: Partial<TransactionsSummaryFilters>,
+  db?: TransactionsClient,
+): Promise<TransactionsSummary> {
+  const client = db ?? (await getTransactionsClient())
+  const parsedFilters = normalizeSummaryFilters(filters)
+
+  const grouped = await client.transaction.groupBy({
+    by: ['type'],
+    where: {
+      userId,
+      date: getDateFilter(parsedFilters),
+    },
+    _sum: {
+      value: true,
+    },
+  })
+
+  const income = Number(grouped.find((item) => item.type === 'CREDIT')?._sum.value ?? 0)
+  const expenses = Number(grouped.find((item) => item.type === 'DEBIT')?._sum.value ?? 0)
+
+  return {
+    income,
+    expenses,
+    balance: income - expenses,
+    month: parsedFilters.month,
+    year: parsedFilters.year,
   }
 }
 
@@ -363,6 +426,19 @@ export const listTransactions = createServerFn({ method: 'GET' })
     }
   })
 
+export const getTransactionsSummary = createServerFn({ method: 'GET' })
+  .inputValidator((input: unknown) =>
+    normalizeSummaryFilters(input as Partial<TransactionsSummaryFilters>),
+  )
+  .handler(async ({ data, request }) => {
+    try {
+      const user = await requireUser(request)
+      return await getTransactionsSummaryForUser(user.id, data)
+    } catch (error) {
+      handleError(error)
+    }
+  })
+
 const createValidator = (input: unknown) => createTransactionSchema.parse(input)
 
 export const createTransaction = createServerFn({ method: 'POST' })
@@ -421,6 +497,20 @@ export function transactionsQueryOptions(filters: Partial<TransactionsFilters> =
   }
 }
 
+export function transactionsSummaryQueryOptions(filters: Partial<TransactionsSummaryFilters> = {}) {
+  const parsedFilters = normalizeSummaryFilters(filters)
+  return {
+    queryKey: ['transactions-summary', parsedFilters],
+    queryFn: () => getTransactionsSummary({ data: parsedFilters }),
+  }
+}
+
 export { normalizeFilters as normalizeTransactionFilters }
-export type { TransactionsFilters, TransactionsListResponse, TransactionDto }
+export type {
+  TransactionsFilters,
+  TransactionsListResponse,
+  TransactionDto,
+  TransactionsSummary,
+  TransactionsSummaryFilters,
+}
 export type { TransactionsClient }

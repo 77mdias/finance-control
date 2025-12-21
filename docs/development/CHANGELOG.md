@@ -25,6 +25,7 @@ O formato é inspirado em _Keep a Changelog_.
 - `docs/development/TASKS/PHASE-1-MVP.md` marca BKD-004/BKD-006 como concluídas e ajusta progresso.
 - `docs/development/API-AUTH.md` alinhado para `/signin` e redirect para `/` nos exemplos; removidas menções a `currency/timezone` no fluxo de sign-up do MVP.
 - `docs/development/TASKS/PHASE-1-MVP.md` atualizado com progresso de FE-001/FE-002/FE-006/FE-007.
+- `docs/development/TASKS/PHASE-1-MVP.md` marca FE-003 como concluída e atualiza o resumo de progresso.
 
 ## [2025-12-19]
 

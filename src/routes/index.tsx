@@ -1,19 +1,65 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query'
-import { Link, Navigate, createFileRoute, redirect } from '@tanstack/react-router'
+import { Navigate, createFileRoute, redirect } from '@tanstack/react-router'
+import { motion } from 'framer-motion'
 
 import { useMemo } from 'react'
-import type { TransactionsFilters, TransactionsListResponse } from '@/server/transactions.server'
-import { transactionsQueryOptions } from '@/server/transactions.server'
+import { ArrowDownRight, ArrowUpRight, Wallet } from 'lucide-react'
+import type {
+  TransactionsFilters,
+  TransactionsListResponse,
+  TransactionsSummary,
+  TransactionsSummaryFilters,
+} from '@/server/transactions.server'
+import {
+  transactionsQueryOptions,
+  transactionsSummaryQueryOptions,
+} from '@/server/transactions.server'
 
+import {
+  DashboardHeader,
+  DashboardShell,
+  DashboardSidebar,
+  MetricCard,
+  TransactionsList,
+} from '@/components/dashboard'
 import { useSession } from '@/lib/auth-client'
 
-function getDefaultDashboardFilters(): TransactionsFilters {
+type DashboardSummaryConfig = {
+  summaryFilters: TransactionsSummaryFilters
+  previousSummaryFilters: TransactionsSummaryFilters
+  recentFilters: TransactionsFilters
+}
+
+function getDefaultSummaryFilters(): TransactionsSummaryFilters {
   const now = new Date()
   return {
     month: now.getUTCMonth() + 1,
     year: now.getUTCFullYear(),
+  }
+}
+
+function getPreviousSummaryFilters(
+  filters: TransactionsSummaryFilters,
+): TransactionsSummaryFilters {
+  if (filters.month === 1) {
+    return {
+      month: 12,
+      year: filters.year - 1,
+    }
+  }
+
+  return {
+    month: filters.month - 1,
+    year: filters.year,
+  }
+}
+
+function getRecentTransactionsFilters(filters: TransactionsSummaryFilters): TransactionsFilters {
+  return {
+    month: filters.month,
+    year: filters.year,
     page: 1,
-    perPage: 5,
+    perPage: 6,
   }
 }
 
@@ -24,33 +70,94 @@ function formatCurrencyBRL(value: number) {
   }).format(value)
 }
 
+function formatMonthLabel(month: number, year: number) {
+  const label = new Intl.DateTimeFormat('pt-BR', {
+    month: 'long',
+    timeZone: 'UTC',
+  }).format(new Date(Date.UTC(year, month - 1, 1)))
+  return label.charAt(0).toUpperCase() + label.slice(1)
+}
+
+function formatLastUpdatedLabel() {
+  const time = new Intl.DateTimeFormat('pt-BR', {
+    hour: '2-digit',
+    minute: '2-digit',
+  }).format(new Date())
+  return `Hoje às ${time}`
+}
+
+function getPercentageDelta(current: number, previous: number) {
+  if (previous <= 0) return null
+  const delta = ((current - previous) / previous) * 100
+  if (!Number.isFinite(delta)) return null
+  return {
+    value: `${Math.abs(delta).toFixed(0)}%`,
+    trend: delta >= 0 ? ('up' as const) : ('down' as const),
+  }
+}
+
 export const Route = createFileRoute('/')({
   loader: async ({ context }) => {
-    const filters = getDefaultDashboardFilters()
+    const summaryFilters = getDefaultSummaryFilters()
+    const previousSummaryFilters = getPreviousSummaryFilters(summaryFilters)
+    const recentFilters = getRecentTransactionsFilters(summaryFilters)
     try {
-      await context.queryClient.ensureQueryData(transactionsQueryOptions(filters))
+      await Promise.all([
+        context.queryClient.ensureQueryData(transactionsSummaryQueryOptions(summaryFilters)),
+        context.queryClient.ensureQueryData(
+          transactionsSummaryQueryOptions(previousSummaryFilters),
+        ),
+        context.queryClient.ensureQueryData(transactionsQueryOptions(recentFilters)),
+      ])
     } catch (error) {
       if (error instanceof Response && error.status === 401) {
         throw redirect({ to: '/signin' })
       }
       throw error
     }
-    return { filters }
+    const config: DashboardSummaryConfig = {
+      summaryFilters,
+      previousSummaryFilters,
+      recentFilters,
+    }
+    return config
   },
   component: DashboardPage,
 })
 
 function DashboardPage() {
-  const { filters } = Route.useLoaderData()
+  const { summaryFilters, previousSummaryFilters, recentFilters } = Route.useLoaderData()
   const queryClient = useQueryClient()
 
   const { data: session, isPending: isSessionPending } = useSession()
 
-  const queryOptions = useMemo(() => transactionsQueryOptions(filters), [filters])
+  const summaryQueryOptions = useMemo(
+    () => transactionsSummaryQueryOptions(summaryFilters),
+    [summaryFilters],
+  )
 
-  const { data, error, isFetching } = useQuery({
-    ...queryOptions,
-    initialData: () => queryClient.getQueryData<TransactionsListResponse>(queryOptions.queryKey),
+  const previousSummaryQueryOptions = useMemo(
+    () => transactionsSummaryQueryOptions(previousSummaryFilters),
+    [previousSummaryFilters],
+  )
+
+  const recentQueryOptions = useMemo(() => transactionsQueryOptions(recentFilters), [recentFilters])
+
+  const summaryQuery = useQuery({
+    ...summaryQueryOptions,
+    initialData: () => queryClient.getQueryData<TransactionsSummary>(summaryQueryOptions.queryKey),
+  })
+
+  const previousSummaryQuery = useQuery({
+    ...previousSummaryQueryOptions,
+    initialData: () =>
+      queryClient.getQueryData<TransactionsSummary>(previousSummaryQueryOptions.queryKey),
+  })
+
+  const recentQuery = useQuery({
+    ...recentQueryOptions,
+    initialData: () =>
+      queryClient.getQueryData<TransactionsListResponse>(recentQueryOptions.queryKey),
   })
 
   if (isSessionPending) {
@@ -61,85 +168,100 @@ function DashboardPage() {
     )
   }
 
-  if (!session || (error instanceof Response && error.status === 401)) {
+  const hasUnauthorizedError = [summaryQuery.error, previousSummaryQuery.error, recentQuery.error]
+    .filter(Boolean)
+    .some((error) => error instanceof Response && error.status === 401)
+
+  if (!session || hasUnauthorizedError) {
     return <Navigate to="/signin" />
   }
 
+  const summary = summaryQuery.data ?? {
+    income: 0,
+    expenses: 0,
+    balance: 0,
+    month: summaryFilters.month,
+    year: summaryFilters.year,
+  }
+
+  const previousSummary = previousSummaryQuery.data
+  const incomeDelta = previousSummary
+    ? getPercentageDelta(summary.income, previousSummary.income)
+    : null
+  const expenseDelta = previousSummary
+    ? getPercentageDelta(summary.expenses, previousSummary.expenses)
+    : null
+
+  const monthLabel = formatMonthLabel(summary.month, summary.year)
+  const lastUpdatedLabel = formatLastUpdatedLabel()
+  const displayName = session.user.name || session.user.email.split('@')[0]
+
+  const animationContainer = {
+    hidden: { opacity: 0 },
+    show: {
+      opacity: 1,
+      transition: { staggerChildren: 0.08, delayChildren: 0.1 },
+    },
+  }
+
+  const animationItem = {
+    hidden: { opacity: 0, y: 16 },
+    show: { opacity: 1, y: 0, transition: { duration: 0.4 } },
+  }
+
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100">
-      <div className="max-w-5xl mx-auto px-6 py-10">
-        <header className="flex flex-col gap-2 mb-8">
-          <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
-          <p className="text-sm text-slate-400">
-            Olá, <span className="text-slate-200">{session.user.name}</span>. Aqui vai um resumo
-            rápido do mês.
-          </p>
-        </header>
+    <DashboardShell>
+      <DashboardSidebar />
+      <motion.main
+        className="flex-1 space-y-8 px-6 py-8 md:px-10"
+        variants={animationContainer}
+        initial="hidden"
+        animate="show"
+      >
+        <motion.section variants={animationItem}>
+          <DashboardHeader
+            userName={displayName}
+            monthLabel={monthLabel}
+            lastUpdatedLabel={lastUpdatedLabel}
+          />
+        </motion.section>
 
-        <section className="rounded-xl border border-slate-800 bg-slate-900/70 shadow-xl">
-          <div className="flex items-center justify-between px-5 py-4 border-b border-slate-800">
-            <div className="flex flex-col">
-              <h2 className="text-base font-semibold text-slate-100">Transações recentes</h2>
-              <p className="text-xs text-slate-500">
-                {filters.month}/{filters.year} • {isFetching ? 'Atualizando...' : 'Sincronizado'}
-              </p>
-            </div>
-            <Link
-              to="/transactions"
-              className="text-sm text-slate-200 hover:text-white underline underline-offset-4"
-            >
-              Ver todas
-            </Link>
+        <motion.section variants={animationItem}>
+          <div className="grid gap-4 lg:grid-cols-3">
+            <MetricCard
+              label="Saldo Atual"
+              value={formatCurrencyBRL(summary.balance)}
+              icon={<Wallet className="h-5 w-5" />}
+              variant="balance"
+            />
+            <MetricCard
+              label="Ganhos do Mês"
+              value={formatCurrencyBRL(summary.income)}
+              icon={<ArrowUpRight className="h-5 w-5" />}
+              variant="income"
+              delta={incomeDelta ?? undefined}
+              showEmptyDelta
+            />
+            <MetricCard
+              label="Gastos do Mês"
+              value={formatCurrencyBRL(summary.expenses)}
+              icon={<ArrowDownRight className="h-5 w-5" />}
+              variant="expense"
+              delta={expenseDelta ?? undefined}
+              showEmptyDelta
+            />
           </div>
+        </motion.section>
 
-          <div className="divide-y divide-slate-800">
-            {!data || data.items.length === 0 ? (
-              <div className="px-5 py-6 text-slate-500 text-sm">
-                Nenhuma transação encontrada para o período.
-              </div>
-            ) : (
-              data.items.map((transaction) => (
-                <article
-                  key={transaction.id}
-                  className="px-5 py-4 flex items-center justify-between gap-4"
-                >
-                  <div className="flex flex-col gap-1 min-w-0">
-                    <div className="flex items-center gap-2">
-                      <span
-                        className={`text-xs px-2 py-1 rounded-full ${
-                          transaction.type === 'CREDIT'
-                            ? 'bg-emerald-500/10 text-emerald-300 border border-emerald-500/30'
-                            : 'bg-rose-500/10 text-rose-300 border border-rose-500/30'
-                        }`}
-                      >
-                        {transaction.type === 'CREDIT' ? 'Crédito' : 'Débito'}
-                      </span>
-                      <span className="text-slate-200 font-semibold truncate">
-                        {transaction.description}
-                      </span>
-                    </div>
-                    <div className="text-xs text-slate-500 flex flex-wrap items-center gap-2">
-                      <span>{transaction.category}</span>
-                      <span aria-hidden="true">•</span>
-                      <span>{new Date(transaction.date).toLocaleDateString('pt-BR')}</span>
-                    </div>
-                  </div>
-
-                  <div className="text-right">
-                    <p
-                      className={`text-base font-semibold ${
-                        transaction.type === 'CREDIT' ? 'text-emerald-300' : 'text-rose-300'
-                      }`}
-                    >
-                      {formatCurrencyBRL(transaction.value)}
-                    </p>
-                  </div>
-                </article>
-              ))
-            )}
-          </div>
-        </section>
-      </div>
-    </div>
+        <motion.section variants={animationItem}>
+          <TransactionsList
+            items={recentQuery.data?.items ?? []}
+            isFetching={recentQuery.isFetching}
+            month={summary.month}
+            year={summary.year}
+          />
+        </motion.section>
+      </motion.main>
+    </DashboardShell>
   )
 }
