@@ -10,7 +10,7 @@ export function AuthPageLayout({ children }: { children: React.ReactNode }) {
     <div className="relative min-h-dvh overflow-hidden bg-background text-foreground">
       <AuthBackground />
 
-      <div className="relative mx-auto grid min-h-dvh w-full max-w-300 grid-cols-1 grid-rows-[auto_1fr] gap-10 px-2 sm:px-4 lg:grid-cols-[1fr_1.5fr] lg:grid-rows-1 lg:gap-0 lg:px-0">
+      <div className="relative grid min-h-dvh w-full items-center grid-cols-1 grid-rows-[auto_1fr] gap-10 px-2 sm:px-4 lg:grid-cols-[1fr_1.5fr] lg:grid-rows-1 lg:gap-0 lg:px-0">
         <div className="relative order-first px-4 pt-12 sm:px-8 lg:order-none lg:px-0 lg:pt-0">
           <AuthCardShowcase className="h-[420px] w-full lg:h-full" />
         </div>

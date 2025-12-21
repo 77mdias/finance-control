@@ -17,7 +17,7 @@ export function AuthCardShowcase({ className }: { className?: string }) {
   return (
     <div
       className={cn(
-        'relative h-full w-full overflow-visible flex flex-col items-center gap-5 px-2 pt-2 lg:block lg:h-full lg:w-full',
+        'relative h-full w-full overflow-visible flex flex-col items-center gap-5 px-2 pt-2 lg:block lg:h-full lg:w-full lg:min-h-[540px] xl:min-h-[640px]',
         className,
       )}
       aria-hidden="true"
