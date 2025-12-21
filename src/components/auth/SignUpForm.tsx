@@ -50,7 +50,8 @@ export function SignUpForm() {
         return
       }
 
-      if (result.error?.message?.toLowerCase().includes('unique')) {
+      const errorMessage = result.error.message
+      if (errorMessage.toLowerCase().includes('unique')) {
         setFormError('A senha única já foi definida. Use "Entrar" para acessar.')
         return
       }
